@@ -1,27 +1,15 @@
-import { ts } from "@ts-morph/bootstrap";
 import { env } from "node:process";
-import { NotImplementError } from "./error.js";
+import { ts } from "@ts-morph/bootstrap";
 import chalk from "chalk";
-
-export namespace transpiler {
-  export class Type {
-    constructor(public name: string) {}
-  }
-  export class Identifier {
-    constructor(public name: string) {}
-  }
-  export class Argument {
-    constructor(public name: Identifier) {}
-  }
-  export class FunctionDeclaration {
-    constructor(public name: string) {}
-  }
-}
+import { NotImplementError } from "./error.js";
+import { FunctionDeclaration, FunctionParameter } from "./IR/function.js";
+import { Type } from "./IR/type.js";
+import { Identifier } from "./IR/base.js";
 
 export class DeclarationExtractor {
   constructor(public readonly typeChecker: ts.TypeChecker) {}
 
-  funcs = new Array<transpiler.FunctionDeclaration>();
+  funcs = new Array<FunctionDeclaration>();
 
   private _ident = "";
 
@@ -39,10 +27,24 @@ export class DeclarationExtractor {
 
   private _handleFunctionDeclaration(node: ts.FunctionDeclaration) {
     if (node.name == undefined) throw new NotImplementError("");
-    let symbol = this.typeChecker.getSymbolAtLocation(node.name);
+    const symbol = this.typeChecker.getSymbolAtLocation(node.name);
     if (symbol == undefined) throw new NotImplementError("");
-    this.funcs.push(new transpiler.FunctionDeclaration(symbol.escapedName.toString()));
-    console.log(`symbol?.escapedName ${symbol.escapedName}`);
+    const signature = this.typeChecker.getSignatureFromDeclaration(node);
+    if (signature == undefined) throw new NotImplementError("");
+    const returnType = this.typeChecker.typeToString(signature.getReturnType());
+    const parameters = signature.getParameters().map((symbol) => {
+      return new FunctionParameter(
+        new Identifier(symbol.escapedName.toString()),
+        new Type(new Identifier(this.typeChecker.typeToString(this.typeChecker.getTypeOfSymbol(symbol))))
+      );
+    });
+    this.funcs.push(
+      new FunctionDeclaration(
+        new Identifier(symbol.escapedName.toString()),
+        new Type(new Identifier(returnType)),
+        parameters
+      )
+    );
   }
 
   private _runImpl(node: ts.Node) {

@@ -6,7 +6,10 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "inlineSourceMap": true
+    "sourceMap": true,
+    "moduleResolution": "nodenext",
+    "allowJs": true
   },
-  "include": ["transpiler"]
+  "include": ["transpiler"],
+  "exclude": ["transpiler/test"]
 }
