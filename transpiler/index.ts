@@ -1,6 +1,6 @@
 import { Source, SourceLoader } from "./source_loader.js";
 import { DeclarationExtractor } from "./declaration_extractor.js";
-import * as CodeEmitter from "./code_emitter.js";
+import * as CodeEmitter from "./emitter/function_emitter.js";
 import chalk from "chalk";
 
 const loader = new SourceLoader();
