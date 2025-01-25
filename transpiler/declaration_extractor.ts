@@ -42,7 +42,8 @@ export class DeclarationExtractor {
       new FunctionDeclaration(
         new Identifier(symbol.escapedName.toString()),
         new Type(new Identifier(returnType)),
-        parameters
+        parameters,
+        node.body
       )
     );
   }
