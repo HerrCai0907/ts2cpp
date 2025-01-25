@@ -14,7 +14,7 @@ function emitReturnStatement(node: ts.ReturnStatement, config: CodeEmitConfig) {
   if (node.expression == undefined) {
     w(`return;`);
   } else {
-    w(`return ${generateExpression(node.expression)};`);
+    w(`return ${generateExpression(node.expression, config)};`);
   }
 }
 
