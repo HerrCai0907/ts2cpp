@@ -7,6 +7,7 @@ export class DeclarationExtractor {
   constructor() {}
 
   funcs = new Array<ts.FunctionDeclaration>();
+  records = new Array<ts.ClassDeclaration>();
 
   private _ident = "";
 
@@ -24,24 +25,18 @@ export class DeclarationExtractor {
 
   private _runImpl(node: ts.Node) {
     this._startVisit(node);
+    const SyntaxKind = ts.SyntaxKind;
     switch (node.kind) {
-      case ts.SyntaxKind.SourceFile:
+      case SyntaxKind.SourceFile:
         node.forEachChild((child) => this._runImpl(child));
         break;
-      case ts.SyntaxKind.FirstStatement:
-        break;
-      case ts.SyntaxKind.FunctionDeclaration:
+      case SyntaxKind.FunctionDeclaration:
         this.funcs.push(node as ts.FunctionDeclaration);
         break;
-      case ts.SyntaxKind.ImportDeclaration:
-        (node as ts.ImportDeclaration).importClause?.forEachChild((child) => this._runImpl(child));
+      case SyntaxKind.ClassDeclaration:
+        this.records.push(node as ts.ClassDeclaration);
         break;
-      case ts.SyntaxKind.NamedImports:
-        (node as ts.NamedImports).elements.forEach((element) => this._runImpl(element));
-        break;
-      case ts.SyntaxKind.ImportSpecifier:
-        break;
-      case ts.SyntaxKind.EndOfFileToken:
+      case SyntaxKind.EndOfFileToken:
         break;
       default:
         throw new NotImplementError(`Unsupported node kind: ${ts.SyntaxKind[node.kind]}`);
