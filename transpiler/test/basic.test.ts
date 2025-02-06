@@ -69,7 +69,7 @@ describe("basic function", () => {
       `
       "
       auto ts_start() -> ts_void {
-      return;
+        return;
       }
       "
     `
@@ -78,7 +78,7 @@ describe("basic function", () => {
       `
       "
       auto ts_start() -> ts_number {
-      return 0;
+        return 0;
       }
       "
     `
@@ -87,7 +87,7 @@ describe("basic function", () => {
       `
       "
       auto ts_start() -> ts_number {
-      return 0;
+        return 0;
       }
       "
     `
@@ -96,7 +96,7 @@ describe("basic function", () => {
       `
       "
       auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
-      return ts_a + ts_b;
+        return ts_a + ts_b;
       }
       "
     `
@@ -119,6 +119,20 @@ describe("basic class", () => {
       struct ts_A {
         ts_number ts_a;
         ts_string ts_b;
+      };
+      "
+    `);
+    expect(transpilerClassDeclaration(`class A { foo () {} }`)).toMatchInlineSnapshot(`
+      "
+      struct ts_A {
+        auto ts_foo() -> ts_void;
+      };
+      "
+    `);
+    expect(transpilerClassDeclaration(`class A { foo () { return 1; } }`)).toMatchInlineSnapshot(`
+      "
+      struct ts_A {
+        auto ts_foo() -> ts_number;
       };
       "
     `);

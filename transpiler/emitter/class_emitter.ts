@@ -3,6 +3,9 @@ import { CodeEmitConfig } from "./config.js";
 import { generateIdentifier } from "./identifier_generator.js";
 import { CannotResolveSymbol, NotImplementError } from "../error.js";
 import { generateType } from "./type_generator.js";
+import {} from "./type_helper.js";
+import { emitMethodDeclaration } from "./function_emitter.js";
+import { indent } from "./indent.js";
 
 export function emitClassPreDeclaration(node: ts.ClassDeclaration, config: CodeEmitConfig) {
   if (node.name == undefined) throw new NotImplementError();
@@ -20,10 +23,13 @@ export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmit
       if (ts.isIdentifier(member.name)) {
         const symbol = typeChecker.getSymbolAtLocation(member.name);
         if (symbol == undefined) throw new CannotResolveSymbol();
-        w(`  ${generateType(typeChecker.getTypeOfSymbol(symbol), config)} ${generateIdentifier(member.name, config)};`);
+        const type = typeChecker.getTypeOfSymbol(symbol);
+        indent(w)(`${generateType(type, config)} ${generateIdentifier(member.name, config)};`);
       } else {
         throw new NotImplementError(ts.SyntaxKind[member.name.kind]);
       }
+    } else if (ts.isMethodDeclaration(member)) {
+      emitMethodDeclaration(member, { ...config, write: indent(w) });
     } else {
       throw new NotImplementError(ts.SyntaxKind[member.kind]);
     }
