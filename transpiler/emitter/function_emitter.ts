@@ -7,28 +7,42 @@ import { generateIdentifier } from "./identifier_generator.js";
 import { zip } from "../adt/array.js";
 import { indent } from "./indent.js";
 
-export function emitFunctionDeclaration(node: ts.FunctionDeclaration, config: CodeEmitConfig) {
+export function emitFunctionDeclaration(funcNode: ts.FunctionDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
-  const { name, returnType, parameters } = processFunctionDefinition(node, config);
+  const { name, returnType, parameters } = processFunctionDeclaration(funcNode, config);
   w(`auto ${name}(${parameters}) -> ${returnType};`);
 }
 
-export function emitFunctionDefinition(node: ts.FunctionDeclaration, config: CodeEmitConfig) {
-  if (node.body == undefined) throw new AssertFalse("function body is null");
+export function emitFunctionDefinition(funcNode: ts.FunctionDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
-  const { name, returnType, parameters } = processFunctionDefinition(node, config);
+  if (funcNode.body == undefined) throw new AssertFalse("function body is null");
+  const { name, returnType, parameters } = processFunctionDeclaration(funcNode, config);
   w(`auto ${name}(${parameters}) -> ${returnType} {`);
-  emitStatement(node.body, { ...config, write: indent(w) });
+  emitStatement(funcNode.body, { ...config, write: indent(w) });
   w(`}`);
 }
 
-export function emitMethodDeclaration(node: ts.MethodDeclaration, config: CodeEmitConfig) {
+export function emitMethodDeclaration(methodNode: ts.MethodDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
-  const { name, returnType, parameters } = processFunctionDefinition(node, config);
+  const { name, returnType, parameters } = processFunctionDeclaration(methodNode, config);
   w(`auto ${name}(${parameters}) -> ${returnType};`);
 }
 
-function processFunctionDefinition(node: ts.FunctionDeclaration | ts.MethodDeclaration, config: CodeEmitConfig) {
+export function emitMethodDefinition(
+  classNode: ts.ClassDeclaration,
+  methodNode: ts.MethodDeclaration,
+  config: CodeEmitConfig
+) {
+  let w = (str: string) => config.write(str);
+  if (methodNode.body == undefined) throw new AssertFalse("function body is null");
+  if (classNode.name == undefined) throw new AssertFalse("function body is null");
+  const { name, returnType, parameters } = processFunctionDeclaration(methodNode, config);
+  w(`auto ${generateIdentifier(classNode.name, config)}::${name}(${parameters}) -> ${returnType} {`);
+  emitStatement(methodNode.body, { ...config, write: indent(w) });
+  w(`}`);
+}
+
+function processFunctionDeclaration(node: ts.FunctionDeclaration | ts.MethodDeclaration, config: CodeEmitConfig) {
   if (node.name == undefined) throw new NotImplementError();
   const symbol = config.typeChecker.getSymbolAtLocation(node.name);
   if (symbol == undefined) throw new NotImplementError();

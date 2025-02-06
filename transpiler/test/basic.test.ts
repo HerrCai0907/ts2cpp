@@ -49,6 +49,14 @@ function transpilerClassDeclaration(code: string) {
   });
 }
 
+function transpilerClassDefinition(code: string) {
+  return transpiler(code, (extractor, config) => {
+    extractor.records.forEach((record) => {
+      CodeEmitter.emitClassDefinition(record, config);
+    });
+  });
+}
+
 describe("basic function", () => {
   test("function declaration", () => {
     expect(transpilerFunctionDeclaration("function start() {}")).toMatchInlineSnapshot(`
@@ -113,7 +121,7 @@ describe("basic class", () => {
     `);
   });
 
-  test("class definition", () => {
+  test("class declaration", () => {
     expect(transpilerClassDeclaration(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
       "
       struct ts_A {
@@ -134,6 +142,37 @@ describe("basic class", () => {
       struct ts_A {
         auto ts_foo() -> ts_number;
       };
+      "
+    `);
+  });
+
+  test("class definition", () => {
+    expect(transpilerClassDefinition(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
+      "
+
+      "
+    `);
+    expect(transpilerClassDefinition(`class A { foo () {} }`)).toMatchInlineSnapshot(`
+      "
+        auto ts_A::ts_foo() -> ts_void {
+        }
+      "
+    `);
+    expect(
+      transpilerClassDefinition(`
+      class A {
+        foo() { return 1; }
+        bar(a: number, b: number) { return a + b; }
+      }
+      `)
+    ).toMatchInlineSnapshot(`
+      "
+        auto ts_A::ts_foo() -> ts_number {
+          return 1;
+        }
+        auto ts_A::ts_bar(ts_number ts_a, ts_number ts_b) -> ts_number {
+          return ts_a + ts_b;
+        }
       "
     `);
   });
