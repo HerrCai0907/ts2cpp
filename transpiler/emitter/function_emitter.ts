@@ -2,10 +2,11 @@ import { ts } from "@ts-morph/bootstrap";
 import { AssertFalse, NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
 import { emitStatement } from "./statement_emitter.js";
-import { generateType } from "./type_generator.js";
+import { generateTypeByType } from "./type_generator.js";
 import { generateIdentifier } from "./identifier_generator.js";
 import { zip } from "../adt/array.js";
 import { indent } from "./indent.js";
+import { emitFunctionEntryRaii } from "./builtin/gc.js";
 
 export function emitFunctionDeclaration(funcNode: ts.FunctionDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
@@ -18,7 +19,9 @@ export function emitFunctionDefinition(funcNode: ts.FunctionDeclaration, config:
   if (funcNode.body == undefined) throw new AssertFalse("function body is null");
   const { name, returnType, parameters } = processFunctionDeclaration(funcNode, config);
   w(`auto ${name}(${parameters}) -> ${returnType} {`);
-  emitStatement(funcNode.body, { ...config, write: indent(w) });
+  const innerConfig = { ...config, write: indent(w) };
+  emitFunctionEntryRaii(innerConfig);
+  emitStatement(funcNode.body, innerConfig);
   w(`}`);
 }
 
@@ -38,7 +41,9 @@ export function emitMethodDefinition(
   if (classNode.name == undefined) throw new AssertFalse("function body is null");
   const { name, returnType, parameters } = processFunctionDeclaration(methodNode, config);
   w(`auto ${generateIdentifier(classNode.name, config)}::${name}(${parameters}) -> ${returnType} {`);
-  emitStatement(methodNode.body, { ...config, write: indent(w) });
+  const innerConfig = { ...config, write: indent(w) };
+  emitFunctionEntryRaii(innerConfig);
+  emitStatement(methodNode.body, innerConfig);
   w(`}`);
 }
 
@@ -50,11 +55,13 @@ function processFunctionDeclaration(node: ts.FunctionDeclaration | ts.MethodDecl
   if (signature == undefined) throw new NotImplementError();
   if (!ts.isIdentifier(node.name)) throw new NotImplementError();
   const name = generateIdentifier(node.name, config);
-  const returnType = generateType(signature.getReturnType(), config);
+  const returnType = generateTypeByType(signature.getReturnType(), config);
   const parameters = zip(signature.getParameters(), node.parameters)
     .map(([symbol, decl]) => {
       if (ts.isIdentifier(decl.name)) {
-        return `${generateType(config.typeChecker.getTypeOfSymbol(symbol), config)} ${generateIdentifier(decl.name, config)}`;
+        const type = generateTypeByType(config.typeChecker.getTypeOfSymbol(symbol), config);
+        const name = generateIdentifier(decl.name, config);
+        return `${type} ${name}`;
       } else {
         throw new NotImplementError("BindingPattern");
       }

@@ -3,6 +3,7 @@ import { ts } from "@ts-morph/bootstrap";
 import chalk from "chalk";
 import { NotImplementError } from "./error.js";
 
+// extractor top level declaration
 export class DeclarationExtractor {
   constructor() {}
 

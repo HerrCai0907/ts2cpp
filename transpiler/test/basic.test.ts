@@ -1,61 +1,11 @@
-import { Source, SourceLoader } from "../source_loader";
-import * as CodeEmitter from "../emitter";
-import { DeclarationExtractor } from "../declaration_extractor";
 import { describe, test, expect } from "vitest";
-import { CodeEmitConfig } from "../emitter/config";
-
-function transpiler(code: string, fn: (extractor: DeclarationExtractor, config: CodeEmitConfig) => void): string {
-  const loader = new SourceLoader();
-  loader.loadSource(new Source("demo.ts", code));
-  let config: CodeEmitConfig = { write: (m) => output.push(m), typeChecker: loader.typeChecker };
-  let output: string[] = [];
-  loader.forEachSource((sourceFile) => {
-    let extractor = new DeclarationExtractor();
-    extractor.run(sourceFile);
-    fn(extractor, config);
-  });
-  return "\n" + output.join("\n") + "\n";
-}
-
-function transpilerFunctionDeclaration(code: string) {
-  return transpiler(code, (extractor, config) => {
-    extractor.funcs.forEach((func) => {
-      CodeEmitter.emitFunctionDeclaration(func, config);
-    });
-  });
-}
-
-function transpilerFunctionDefinition(code: string) {
-  return transpiler(code, (extractor, config) => {
-    extractor.funcs.forEach((func) => {
-      CodeEmitter.emitFunctionDefinition(func, config);
-    });
-  });
-}
-
-function transpilerClassPreDeclaration(code: string) {
-  return transpiler(code, (extractor, config) => {
-    extractor.records.forEach((record) => {
-      CodeEmitter.emitClassPreDeclaration(record, config);
-    });
-  });
-}
-
-function transpilerClassDeclaration(code: string) {
-  return transpiler(code, (extractor, config) => {
-    extractor.records.forEach((record) => {
-      CodeEmitter.emitClassDeclaration(record, config);
-    });
-  });
-}
-
-function transpilerClassDefinition(code: string) {
-  return transpiler(code, (extractor, config) => {
-    extractor.records.forEach((record) => {
-      CodeEmitter.emitClassDefinition(record, config);
-    });
-  });
-}
+import {
+  transpilerClassDeclaration,
+  transpilerClassDefinition,
+  transpilerClassPreDeclaration,
+  transpilerFunctionDeclaration,
+  transpilerFunctionDefinition,
+} from "./helper";
 
 describe("basic function", () => {
   test("function declaration", () => {
@@ -77,6 +27,7 @@ describe("basic function", () => {
       `
       "
       auto ts_start() -> ts_void {
+        ts_builtin::StackManagerRaii raii{};
         return;
       }
       "
@@ -86,6 +37,7 @@ describe("basic function", () => {
       `
       "
       auto ts_start() -> ts_number {
+        ts_builtin::StackManagerRaii raii{};
         return 0;
       }
       "
@@ -95,6 +47,7 @@ describe("basic function", () => {
       `
       "
       auto ts_start() -> ts_number {
+        ts_builtin::StackManagerRaii raii{};
         return 0;
       }
       "
@@ -104,6 +57,7 @@ describe("basic function", () => {
       `
       "
       auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
+        ts_builtin::StackManagerRaii raii{};
         return ts_builtin::_plus_token(ts_a, ts_b);
       }
       "
@@ -153,11 +107,12 @@ describe("basic class", () => {
       "
     `);
     expect(transpilerClassDefinition(`class A { foo () {} }`)).toMatchInlineSnapshot(`
-      "
-        auto ts_A::ts_foo() -> ts_void {
-        }
-      "
-    `);
+        "
+          auto ts_A::ts_foo() -> ts_void {
+            ts_builtin::StackManagerRaii raii{};
+          }
+        "
+      `);
     expect(
       transpilerClassDefinition(`
       class A {
@@ -168,9 +123,11 @@ describe("basic class", () => {
     ).toMatchInlineSnapshot(`
       "
         auto ts_A::ts_foo() -> ts_number {
+          ts_builtin::StackManagerRaii raii{};
           return 1;
         }
         auto ts_A::ts_bar(ts_number ts_a, ts_number ts_b) -> ts_number {
+          ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_plus_token(ts_a, ts_b);
         }
       "
@@ -178,7 +135,7 @@ describe("basic class", () => {
   });
 });
 
-describe("expression", () => {
+describe("basic expression", () => {
   describe("binary expression", () => {
     test("normal operator", () => {
       expect(
@@ -190,6 +147,7 @@ describe("expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+          ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_plus_token(ts_a, ts_b);
         }
         "
@@ -204,6 +162,7 @@ describe("expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+          ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_minus_token(ts_a, ts_b);
         }
         "
@@ -220,6 +179,7 @@ describe("expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_boolean {
+          ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_exclamation_equals_equals_token(ts_a, ts_b);
         }
         "
@@ -233,6 +193,7 @@ describe("expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_boolean {
+          ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_equals_equals_equals_token(ts_a, ts_b);
         }
         "
@@ -247,7 +208,27 @@ describe("expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+          ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_question_question_token(ts_a, ts_b);
+        }
+        "
+      `);
+    });
+  });
+
+  describe("call expression", () => {
+    test("function call", () => {
+      expect(
+        transpilerFunctionDefinition(`
+          function f(a:number, b:number) {
+            return f(a, b);
+          }
+    `)
+      ).toMatchInlineSnapshot(`
+        "
+        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_never {
+          ts_builtin::StackManagerRaii raii{};
+          return ts_f(ts_a, ts_b);
         }
         "
       `);
