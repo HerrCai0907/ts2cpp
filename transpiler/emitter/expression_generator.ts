@@ -15,10 +15,11 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
   }
 }
 
-function generateBinaryToken(token: ts.BinaryOperatorToken, _: CodeEmitConfig): string {
-  return token.getText();
+function generateBinaryOperatorBuiltinFunc(token: ts.BinaryOperatorToken, _: CodeEmitConfig): string {
+  let tokenName = ts.SyntaxKind[token.kind].replace(/[A-Z]/g, (r: string) => `_${r.toLowerCase()}`);
+  return `ts_builtin::${tokenName}`;
 }
 
 function generateBinaryExpression(node: ts.BinaryExpression, config: CodeEmitConfig): string {
-  return `${generateExpression(node.left, config)} ${generateBinaryToken(node.operatorToken, config)} ${generateExpression(node.right, config)}`;
+  return `${generateBinaryOperatorBuiltinFunc(node.operatorToken, config)}(${generateExpression(node.left, config)}, ${generateExpression(node.right, config)})`;
 }

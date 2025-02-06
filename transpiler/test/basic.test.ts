@@ -104,7 +104,7 @@ describe("basic function", () => {
       `
       "
       auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
-        return ts_a + ts_b;
+        return ts_builtin::_plus_token(ts_a, ts_b);
       }
       "
     `
@@ -171,9 +171,86 @@ describe("basic class", () => {
           return 1;
         }
         auto ts_A::ts_bar(ts_number ts_a, ts_number ts_b) -> ts_number {
-          return ts_a + ts_b;
+          return ts_builtin::_plus_token(ts_a, ts_b);
         }
       "
     `);
+  });
+});
+
+describe("expression", () => {
+  describe("binary expression", () => {
+    test("normal operator", () => {
+      expect(
+        transpilerFunctionDefinition(`
+          function f(a:number, b:number) {
+            return a + b;
+          }
+      `)
+      ).toMatchInlineSnapshot(`
+        "
+        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+          return ts_builtin::_plus_token(ts_a, ts_b);
+        }
+        "
+      `);
+
+      expect(
+        transpilerFunctionDefinition(`
+          function f(a:number, b:number) {
+            return a - b;
+          }
+      `)
+      ).toMatchInlineSnapshot(`
+        "
+        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+          return ts_builtin::_minus_token(ts_a, ts_b);
+        }
+        "
+      `);
+    });
+
+    test("ts special operator", () => {
+      expect(
+        transpilerFunctionDefinition(`
+          function f(a:number, b:number) {
+            return a !== b;
+          }
+      `)
+      ).toMatchInlineSnapshot(`
+        "
+        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_boolean {
+          return ts_builtin::_exclamation_equals_equals_token(ts_a, ts_b);
+        }
+        "
+      `);
+      expect(
+        transpilerFunctionDefinition(`
+          function f(a:number, b:number) {
+            return a === b;
+          }
+    `)
+      ).toMatchInlineSnapshot(`
+        "
+        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_boolean {
+          return ts_builtin::_equals_equals_equals_token(ts_a, ts_b);
+        }
+        "
+      `);
+
+      expect(
+        transpilerFunctionDefinition(`
+          function f(a:number, b:number) {
+            return a ?? b;
+          }
+    `)
+      ).toMatchInlineSnapshot(`
+        "
+        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+          return ts_builtin::_question_question_token(ts_a, ts_b);
+        }
+        "
+      `);
+    });
   });
 });
