@@ -106,14 +106,19 @@ describe("basic class", () => {
   test("class definition", () => {
     expect(transpilerClassDefinition(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
       "
-
+      void ts_A::ts_gc_visit_all_children() const {
+        ts_builtin::gc_visit(this->ts_a);
+        ts_builtin::gc_visit(this->ts_b);
+      }
       "
     `);
     expect(transpilerClassDefinition(`class A { foo () {} }`)).toMatchInlineSnapshot(`
       "
-        auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_void> {
-          ts_builtin::StackManagerRaii raii{};
-        }
+      auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_void> {
+        ts_builtin::StackManagerRaii raii{};
+      }
+      void ts_A::ts_gc_visit_all_children() const {
+      }
       "
     `);
     expect(
@@ -125,14 +130,16 @@ describe("basic class", () => {
       `)
     ).toMatchInlineSnapshot(`
       "
-        auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_number> {
-          ts_builtin::StackManagerRaii raii{};
-          return 1;
-        }
-        auto ts_A::ts_bar(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
-          ts_builtin::StackManagerRaii raii{};
-          return ts_builtin::_plus_token(ts_a, ts_b);
-        }
+      auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_number> {
+        ts_builtin::StackManagerRaii raii{};
+        return 1;
+      }
+      auto ts_A::ts_bar(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
+        ts_builtin::StackManagerRaii raii{};
+        return ts_builtin::_plus_token(ts_a, ts_b);
+      }
+      void ts_A::ts_gc_visit_all_children() const {
+      }
       "
     `);
   });

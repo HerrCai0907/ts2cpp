@@ -5,6 +5,8 @@ export function emitFunctionEntryRaii(config: CodeEmitConfig) {
   w(`ts_builtin::StackManagerRaii raii{};`);
 }
 
-export function generateGcObject(ptrExpr: string) {
-  return `ts_builtin::create_object(${ptrExpr})`;
-}
+export const gcCreateObjectFn = `ts_builtin::create_object`;
+
+export const gcVisitFn = `ts_builtin::gc_visit`;
+
+export const gcObjClass = `ts_builtin::GcObject`;

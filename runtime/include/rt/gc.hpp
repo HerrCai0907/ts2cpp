@@ -9,6 +9,16 @@ struct GcObject {
   virtual void ts_gc_visit_all_children() const = 0;
 };
 
+template <class T> void gc_visit(T obj) {
+  if constexpr (std::is_pointer_v<T>) {
+    static_assert(std::is_base_of_v<std::remove_pointer_t<T>, GcObject>,
+                  "gc visit only support GcObject*");
+    obj->ts_gc_visit_all_children();
+  } else {
+    // normal type, ignore
+  }
+}
+
 struct Root {
   static Root &ins() {
     static Root ins{};

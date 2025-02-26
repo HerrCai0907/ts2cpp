@@ -2,6 +2,7 @@ import { ts } from "@ts-morph/bootstrap";
 import { CodeEmitConfig } from "./config.js";
 import assert from "assert";
 import { CannotResolveSymbol } from "../error.js";
+import { typeTemplate } from "./builtin/type.js";
 
 export function generateTypeByNode(node: ts.Node, config: CodeEmitConfig): string {
   let { typeChecker } = config;
@@ -17,7 +18,7 @@ export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): strin
 }
 
 function generateType(t: string): string {
-  return `ts_builtin::ts_type_t<ts_${t}>`;
+  return `${typeTemplate}<ts_${t}>`;
 }
 
 export function generateRawTypeByTypeNode(node: ts.Node, config: CodeEmitConfig): string {

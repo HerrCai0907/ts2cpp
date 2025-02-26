@@ -5,17 +5,21 @@ import { NotImplementError } from "../error.js";
 import { generateTypeByNode } from "./type_generator.js";
 import { emitMethodDeclaration, emitMethodDefinition } from "./function_emitter.js";
 import { indent } from "./indent.js";
+import { gcObjClass, gcVisitFn } from "./builtin/gc.js";
+
+function getClassName(node: ts.ClassDeclaration, config: CodeEmitConfig): string {
+  if (node.name == undefined) throw new NotImplementError();
+  return generateIdentifier(node.name, config);
+}
 
 export function emitClassPreDeclaration(node: ts.ClassDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
-  if (node.name == undefined) throw new NotImplementError();
-  w(`struct ${generateIdentifier(node.name, config)};`);
+  w(`struct ${getClassName(node, config)};`);
 }
 
 export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
-  if (node.name == undefined) throw new NotImplementError();
-  w(`struct ${generateIdentifier(node.name, config)} : public ts_builtin::GcObject {`);
+  w(`struct ${getClassName(node, config)} : public ${gcObjClass} {`);
   const innerConfig = { ...config, write: indent(w) };
   node.members.forEach((member) => {
     if (ts.isPropertyDeclaration(member)) {
@@ -39,7 +43,23 @@ export function emitClassDefinition(node: ts.ClassDeclaration, config: CodeEmitC
   if (node.name == undefined) throw new NotImplementError();
   node.members.forEach((member) => {
     if (ts.isMethodDeclaration(member)) {
-      emitMethodDefinition(node, member, { ...config, write: indent(w) });
+      emitMethodDefinition(node, member, { ...config, write: w });
     }
   });
+  emitVisitOverride(node, config);
+}
+
+function emitVisitOverride(node: ts.ClassDeclaration, config: CodeEmitConfig) {
+  let w = (str: string) => config.write(str);
+  w(`void ${getClassName(node, config)}::ts_gc_visit_all_children() const {`);
+  node.members.forEach((member) => {
+    if (ts.isPropertyDeclaration(member)) {
+      if (ts.isIdentifier(member.name)) {
+        indent(w)(`${gcVisitFn}(this->${generateIdentifier(member.name, config)});`);
+      } else {
+        throw new NotImplementError(ts.SyntaxKind[member.name.kind]);
+      }
+    }
+  });
+  w(`}`);
 }

@@ -1,7 +1,7 @@
 import { ts } from "@ts-morph/bootstrap";
 import { NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
-import { generateGcObject } from "./builtin/gc.js";
+import { gcCreateObjectFn } from "./builtin/gc.js";
 import { generateRawTypeByTypeNode } from "./type_generator.js";
 
 export function generateExpression(node: ts.Expression, config: CodeEmitConfig): string {
@@ -42,5 +42,5 @@ function generateNewExpression(node: ts.NewExpression, config: CodeEmitConfig): 
   const args = node.arguments?.map((v) => generateExpression(v, config)).join(",") ?? "";
   const type = generateRawTypeByTypeNode(node.expression, config);
   const ptrExpr = `new ${type}(${args})`;
-  return `${generateGcObject(ptrExpr)}`;
+  return `${gcCreateObjectFn}(${ptrExpr})`;
 }
