@@ -5,7 +5,7 @@ import { AssertFalse } from "./error.js";
 export class Source {
   constructor(
     public readonly path: string,
-    public readonly text: string
+    public readonly text: string,
   ) {}
 }
 
@@ -20,12 +20,14 @@ export class SourceLoader {
     this.program = this._project.createProgram();
   }
 
-  forEachSource(fn: (node: ts.SourceFile) => void): void {
+  forEachSource<T>(fn: (node: ts.SourceFile) => T): T[] {
+    let ret = [];
     for (let path of this._sourcePath) {
       let source = this.program.getSourceFile(path);
       if (source == undefined) throw new AssertFalse(`invalid source ${path}`);
-      fn(source);
+      ret.push(fn(source));
     }
+    return ret;
   }
 
   getDiags(): string[] {
