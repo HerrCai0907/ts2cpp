@@ -47,4 +47,5 @@ let outputs = loader.forEachSource((sourceFile: ts.SourceFile): Output => {
   return new Output(sourceFile.fileName.replace(/\.ts$/, ".cc"), output.join("\n"));
 });
 
+console.log(outputs.map((v) => `outputs: ${v.filePath}`).join("\n"));
 outputs.forEach((o) => writeFileSync(o.filePath, o.code));

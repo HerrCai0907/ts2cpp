@@ -31,7 +31,6 @@ export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmit
     }
   });
   indent(w)(`void ts_gc_visit_all_children() const override;`);
-  node.members.forEach((member) => {});
   w(`};`);
 }
 
