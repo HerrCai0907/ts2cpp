@@ -1,10 +1,8 @@
-export module gc;
+#pragma once
 
 #include <type_traits>
 
 namespace ts_builtin {
-
-using size_t = unsigned int;
 
 struct GcObject {
   virtual ~GcObject() = default;
@@ -22,6 +20,8 @@ struct Root {
   }
   GcRef m_shadowstack[1024];
   size_t m_index = 0U;
+
+  void push(GcRef const &ref) noexcept;
 };
 
 struct StackManagerRaii {
@@ -35,6 +35,7 @@ concept IsGcObject = std::is_base_of_v<GcObject, T>;
 
 template <IsGcObject T> GcRef create_object(T *ptr) {
   GcRef ref{.m_data = ptr};
+  Root::ins().push(ref);
   return ref;
 }
 
