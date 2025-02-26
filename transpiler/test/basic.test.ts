@@ -11,13 +11,13 @@ describe("basic function", () => {
   test("function declaration", () => {
     expect(transpilerFunctionDeclaration("function start() {}")).toMatchInlineSnapshot(`
       "
-      auto ts_start() -> ts_void;
+      auto ts_start() -> ts_builtin::ts_type_t<ts_void>;
       "
     `);
     expect(transpilerFunctionDeclaration("function add(a:number, b:number): number {}")).toMatchInlineSnapshot(
       `
       "
-      auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number;
+      auto ts_add(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number>;
       "
     `
     );
@@ -26,7 +26,7 @@ describe("basic function", () => {
     expect(transpilerFunctionDefinition("function start() { return; }")).toMatchInlineSnapshot(
       `
       "
-      auto ts_start() -> ts_void {
+      auto ts_start() -> ts_builtin::ts_type_t<ts_void> {
         ts_builtin::StackManagerRaii raii{};
         return;
       }
@@ -36,7 +36,7 @@ describe("basic function", () => {
     expect(transpilerFunctionDefinition("function start() : number { return 0; }")).toMatchInlineSnapshot(
       `
       "
-      auto ts_start() -> ts_number {
+      auto ts_start() -> ts_builtin::ts_type_t<ts_number> {
         ts_builtin::StackManagerRaii raii{};
         return 0;
       }
@@ -46,7 +46,7 @@ describe("basic function", () => {
     expect(transpilerFunctionDefinition("function start() { return 0; }")).toMatchInlineSnapshot(
       `
       "
-      auto ts_start() -> ts_number {
+      auto ts_start() -> ts_builtin::ts_type_t<ts_number> {
         ts_builtin::StackManagerRaii raii{};
         return 0;
       }
@@ -56,7 +56,7 @@ describe("basic function", () => {
     expect(transpilerFunctionDefinition(`function add(a:number, b:number) { return a + b; }`)).toMatchInlineSnapshot(
       `
       "
-      auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
+      auto ts_add(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
         ts_builtin::StackManagerRaii raii{};
         return ts_builtin::_plus_token(ts_a, ts_b);
       }
@@ -78,23 +78,23 @@ describe("basic class", () => {
   test("class declaration", () => {
     expect(transpilerClassDeclaration(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
       "
-      struct ts_A {
-        ts_number ts_a;
-        ts_string ts_b;
+      struct ts_A : public ts_builtin::GcObject {
+        ts_builtin::ts_type_t<ts_number> ts_a;
+        ts_builtin::ts_type_t<ts_string> ts_b;
       };
       "
     `);
     expect(transpilerClassDeclaration(`class A { foo () {} }`)).toMatchInlineSnapshot(`
       "
-      struct ts_A {
-        auto ts_foo() -> ts_void;
+      struct ts_A : public ts_builtin::GcObject {
+        auto ts_foo() -> ts_builtin::ts_type_t<ts_void>;
       };
       "
     `);
     expect(transpilerClassDeclaration(`class A { foo () { return 1; } }`)).toMatchInlineSnapshot(`
       "
-      struct ts_A {
-        auto ts_foo() -> ts_number;
+      struct ts_A : public ts_builtin::GcObject {
+        auto ts_foo() -> ts_builtin::ts_type_t<ts_number>;
       };
       "
     `);
@@ -107,12 +107,12 @@ describe("basic class", () => {
       "
     `);
     expect(transpilerClassDefinition(`class A { foo () {} }`)).toMatchInlineSnapshot(`
-        "
-          auto ts_A::ts_foo() -> ts_void {
-            ts_builtin::StackManagerRaii raii{};
-          }
-        "
-      `);
+      "
+        auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_void> {
+          ts_builtin::StackManagerRaii raii{};
+        }
+      "
+    `);
     expect(
       transpilerClassDefinition(`
       class A {
@@ -122,11 +122,11 @@ describe("basic class", () => {
       `)
     ).toMatchInlineSnapshot(`
       "
-        auto ts_A::ts_foo() -> ts_number {
+        auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_number> {
           ts_builtin::StackManagerRaii raii{};
           return 1;
         }
-        auto ts_A::ts_bar(ts_number ts_a, ts_number ts_b) -> ts_number {
+        auto ts_A::ts_bar(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
           ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_plus_token(ts_a, ts_b);
         }
@@ -146,7 +146,7 @@ describe("basic expression", () => {
       `)
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+        auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
           ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_plus_token(ts_a, ts_b);
         }
@@ -161,7 +161,7 @@ describe("basic expression", () => {
       `)
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+        auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
           ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_minus_token(ts_a, ts_b);
         }
@@ -178,7 +178,7 @@ describe("basic expression", () => {
       `)
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_boolean {
+        auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
           ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_exclamation_equals_equals_token(ts_a, ts_b);
         }
@@ -192,7 +192,7 @@ describe("basic expression", () => {
     `)
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_boolean {
+        auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
           ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_equals_equals_equals_token(ts_a, ts_b);
         }
@@ -207,7 +207,7 @@ describe("basic expression", () => {
     `)
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+        auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
           ts_builtin::StackManagerRaii raii{};
           return ts_builtin::_question_question_token(ts_a, ts_b);
         }
@@ -226,7 +226,7 @@ describe("basic expression", () => {
     `)
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_never {
+        auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_never> {
           ts_builtin::StackManagerRaii raii{};
           return ts_f(ts_a, ts_b);
         }

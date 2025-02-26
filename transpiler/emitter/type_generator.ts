@@ -11,18 +11,18 @@ export function generateTypeByNode(node: ts.Node, config: CodeEmitConfig): strin
   return generateTypeByType(type, config);
 }
 
-export function generateTypeByTypeNode(node: ts.Node, config: CodeEmitConfig): string {
-  let { typeChecker } = config;
-  const symbol: ts.Symbol | undefined = typeChecker.getSymbolAtLocation(node);
-  if (symbol == undefined) throw new CannotResolveSymbol();
-  return generateType(symbol.name);
-}
-
 export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): string {
   assert(!type.isLiteral());
   return generateType(config.typeChecker.typeToString(type));
 }
 
 function generateType(t: string): string {
-  return `ts_${t}`;
+  return `ts_builtin::ts_type_t<ts_${t}>`;
+}
+
+export function generateRawTypeByTypeNode(node: ts.Node, config: CodeEmitConfig): string {
+  let { typeChecker } = config;
+  const symbol: ts.Symbol | undefined = typeChecker.getSymbolAtLocation(node);
+  if (symbol == undefined) throw new CannotResolveSymbol();
+  return `ts_${symbol.name}`;
 }

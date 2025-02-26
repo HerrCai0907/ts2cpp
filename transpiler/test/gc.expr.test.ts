@@ -10,7 +10,7 @@ describe("new expression", () => {
     `)
     ).toMatchInlineSnapshot(`
       "
-      auto ts_f() -> ts_A {
+      auto ts_f() -> ts_builtin::ts_type_t<ts_A> {
         ts_builtin::StackManagerRaii raii{};
         return ts_builtin::create_object(new ts_A());;
       }
@@ -25,7 +25,7 @@ describe("new expression", () => {
     `)
     ).toMatchInlineSnapshot(`
       "
-      auto ts_f() -> ts_A {
+      auto ts_f() -> ts_builtin::ts_type_t<ts_A> {
         ts_builtin::StackManagerRaii raii{};
         return ts_builtin::create_object(new ts_A(1,2,3));;
       }

@@ -2,7 +2,7 @@ import { ts } from "@ts-morph/bootstrap";
 import { NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
 import { generateGcObject } from "./builtin/gc.js";
-import { generateTypeByTypeNode } from "./type_generator.js";
+import { generateRawTypeByTypeNode } from "./type_generator.js";
 
 export function generateExpression(node: ts.Expression, config: CodeEmitConfig): string {
   switch (node.kind) {
@@ -29,7 +29,7 @@ function generateBinaryOperatorBuiltinFunc(token: ts.BinaryOperatorToken, _: Cod
 function generateBinaryExpression(node: ts.BinaryExpression, config: CodeEmitConfig): string {
   return `${generateBinaryOperatorBuiltinFunc(node.operatorToken, config)}(${generateExpression(
     node.left,
-    config
+    config,
   )}, ${generateExpression(node.right, config)})`;
 }
 
@@ -40,7 +40,7 @@ function generateCallExpression(node: ts.CallExpression, config: CodeEmitConfig)
 
 function generateNewExpression(node: ts.NewExpression, config: CodeEmitConfig): string {
   const args = node.arguments?.map((v) => generateExpression(v, config)).join(",") ?? "";
-  const type = generateTypeByTypeNode(node.expression, config);
+  const type = generateRawTypeByTypeNode(node.expression, config);
   const ptrExpr = `new ${type}(${args})`;
   return `${generateGcObject(ptrExpr)};`;
 }
