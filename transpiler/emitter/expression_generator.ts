@@ -42,5 +42,5 @@ function generateNewExpression(node: ts.NewExpression, config: CodeEmitConfig): 
   const args = node.arguments?.map((v) => generateExpression(v, config)).join(",") ?? "";
   const type = generateRawTypeByTypeNode(node.expression, config);
   const ptrExpr = `new ${type}(${args})`;
-  return `${generateGcObject(ptrExpr)};`;
+  return `${generateGcObject(ptrExpr)}`;
 }
