@@ -4,5 +4,5 @@ class A {
 }
 
 function f() {
-  return new A();
+  let a = new A();
 }

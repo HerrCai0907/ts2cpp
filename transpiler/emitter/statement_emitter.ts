@@ -3,6 +3,8 @@ import { NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
 import { generateExpression } from "./expression_generator.js";
 import { gcStackManagerVariant, gcStoreReturnFn } from "./builtin/gc.js";
+import { generateTypeByNode } from "./type_generator.js";
+import { generateIdentifier } from "./identifier_generator.js";
 
 function emitBlock(node: ts.Block, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
@@ -18,9 +20,18 @@ function emitReturnStatement(node: ts.ReturnStatement, config: CodeEmitConfig) {
     w(`return ${gcStoreReturnFn}(${gcStackManagerVariant}, ${generateExpression(node.expression, config)});`);
   }
 }
+function emitVariableStatement(node: ts.VariableStatement, config: CodeEmitConfig) {
+  let w = (str: string) => config.write(str);
+  let declarations = node.declarationList.declarations;
+  if (declarations.length != 1) throw new NotImplementError(`multiple declarations in variable statement`);
+  let declaration = declarations[0];
+  const type = generateTypeByNode(declaration.name, config);
+  const initExpr = declaration.initializer ? generateExpression(declaration.initializer, config) : "";
+  if (!ts.isIdentifier(declaration.name)) throw new NotImplementError(ts.SyntaxKind[declaration.name.kind]);
+  w(`${type} ${generateIdentifier(declaration.name, config)}{${initExpr}};`);
+}
 
 export function emitStatement(node: ts.Statement, config: CodeEmitConfig) {
-  let w = (str: string) => config.write(str);
   switch (node.kind) {
     case ts.SyntaxKind.Block:
       emitBlock(node as ts.Block, config);
@@ -28,7 +39,10 @@ export function emitStatement(node: ts.Statement, config: CodeEmitConfig) {
     case ts.SyntaxKind.ReturnStatement:
       emitReturnStatement(node as ts.ReturnStatement, config);
       break;
+    case ts.SyntaxKind.VariableStatement:
+      emitVariableStatement(node as ts.VariableStatement, config);
+      break;
     default:
-      throw new NotImplementError(`unhandled statement kind ${ts.SyntaxKind[node.kind]}`);
+      throw new NotImplementError(`unhandled statement kind ${node.kind} ${ts.SyntaxKind[node.kind]}`);
   }
 }
