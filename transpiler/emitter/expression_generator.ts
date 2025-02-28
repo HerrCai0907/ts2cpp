@@ -19,6 +19,8 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
       return generateNewExpression(node as ts.NewExpression, config);
     case ts.SyntaxKind.PropertyAccessExpression:
       return generatePropertyAccessExpression(node as ts.PropertyAccessExpression, config);
+    case ts.SyntaxKind.ThisKeyword:
+      return `this`;
     default:
       throw new NotImplementError(`unhandled expression kind ${ts.SyntaxKind[node.kind]}`);
   }

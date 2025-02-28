@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { transpilerFunctionDefinition } from "./helper";
+import { transpilerClassDefinition, transpilerFunctionDefinition } from "./helper";
 
 describe("basic expression", () => {
   describe("binary expression", () => {
@@ -9,7 +9,7 @@ describe("basic expression", () => {
           function f(a:number, b:number) {
             return a + b;
           }
-      `)
+      `),
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
@@ -24,7 +24,7 @@ describe("basic expression", () => {
           function f(a:number, b:number) {
             return a - b;
           }
-      `)
+      `),
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
@@ -41,7 +41,7 @@ describe("basic expression", () => {
           function f(a:number, b:number) {
             return a !== b;
           }
-      `)
+      `),
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
@@ -55,7 +55,7 @@ describe("basic expression", () => {
           function f(a:number, b:number) {
             return a === b;
           }
-    `)
+    `),
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
@@ -70,7 +70,7 @@ describe("basic expression", () => {
           function f(a:number, b:number) {
             return a ?? b;
           }
-    `)
+    `),
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
@@ -89,7 +89,7 @@ describe("basic expression", () => {
           function f(a:number, b:number) {
             return f(a, b);
           }
-    `)
+    `),
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_never> {
@@ -109,7 +109,7 @@ describe("basic expression", () => {
           function f(a: A) {
             a.v;
           }
-    `)
+    `),
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_A> ts_a) -> ts_builtin::ts_type_t<ts_void> {
@@ -126,7 +126,7 @@ describe("basic expression", () => {
           function f(a: A) {
             a.v = 1;
           }
-    `)
+    `),
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_A> ts_a) -> ts_builtin::ts_type_t<ts_void> {
@@ -136,5 +136,22 @@ describe("basic expression", () => {
         "
       `);
     });
+  });
+
+  test("this expr", () => {
+    expect(
+      transpilerClassDefinition(`
+        class A { f() { return this; } }
+  `),
+    ).toMatchInlineSnapshot(`
+      "
+      auto ts_A::ts_f() -> ts_builtin::ts_type_t<ts_this> {
+        ts_builtin::StackManager ts_builtin_stack_manager{};
+        return ts_builtin::store_return(ts_builtin_stack_manager, this);
+      }
+      void ts_A::ts_builtin_gc_visit_all_children() const {
+      }
+      "
+    `);
   });
 });

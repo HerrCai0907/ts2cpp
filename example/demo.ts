@@ -4,6 +4,10 @@ a = 1;
 class A {
   a: number = 10;
   b: A;
+
+  foo() {
+    return this.a + this.b.a;
+  }
 }
 
 function f() {
