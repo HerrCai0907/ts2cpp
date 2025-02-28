@@ -4,28 +4,23 @@ import { CodeEmitConfig } from "./emitter/config.js";
 import { Source, SourceLoader } from "./source_loader.js";
 import * as CodeEmitter from "./emitter/index.js";
 import { readFileSync, writeFileSync } from "node:fs";
+import { indent } from "./emitter/indent.js";
+import { generatedSymbolPrefix } from "./emitter/builtin/runtime.js";
 
 const sourcePath = "example/demo.ts";
 const loader = new SourceLoader();
 loader.loadSource(new Source(sourcePath, readFileSync(sourcePath, "utf-8")));
 
-class Output {
-  constructor(
-    public filePath: string,
-    public code: string,
-  ) {}
-}
+let output: string[] = [`#include "rt/gc.hpp"`, `#include "rt/type.hpp"`];
+const w = (m: string) => output.push(m);
 
-let outputs = loader.forEachSource((sourceFile: ts.SourceFile): Output => {
+loader.forEachSource((sourceFile: ts.SourceFile): void => {
   let extractor = new DeclarationExtractor();
   extractor.run(sourceFile);
 
-  let output: string[] = [`#include "rt/gc.hpp"`, `#include "rt/type.hpp"`];
-
-  let config: CodeEmitConfig = {
-    write: (m) => output.push(m),
-    typeChecker: loader.typeChecker,
-  };
+  const ns = CodeEmitter.convertToNamespace(sourceFile);
+  w(`namespace ${ns} {`);
+  const config: CodeEmitConfig = { typeChecker: loader.typeChecker, write: w };
   extractor.records.forEach((record) => {
     CodeEmitter.emitClassPreDeclaration(record, config);
   });
@@ -47,9 +42,14 @@ let outputs = loader.forEachSource((sourceFile: ts.SourceFile): Output => {
   extractor.records.forEach((record) => {
     CodeEmitter.emitClassDefinition(record, config);
   });
-
-  return new Output(sourceFile.fileName.replace(/\.ts$/, ".cc"), output.join("\n"));
+  w(`} // namespace ${ns}`);
 });
 
-console.log(outputs.map((v) => `outputs: ${v.filePath}`).join("\n"));
-outputs.forEach((o) => writeFileSync(o.filePath, o.code));
+w(`int main() {`);
+loader.forEachSource((sourceFile: ts.SourceFile): void => {
+  const ns = CodeEmitter.convertToNamespace(sourceFile);
+  indent(w)(`${ns}::${generatedSymbolPrefix}_init();`);
+});
+w(`}`);
+
+writeFileSync("example/demo.cc", output.join("\n"));
