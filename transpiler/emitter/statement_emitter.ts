@@ -30,6 +30,10 @@ function emitVariableStatement(node: ts.VariableStatement, config: CodeEmitConfi
   if (!ts.isIdentifier(declaration.name)) throw new NotImplementError(ts.SyntaxKind[declaration.name.kind]);
   w(`${type} ${generateIdentifier(declaration.name, config)}{${initExpr}};`);
 }
+function emitExpressionStatement(node: ts.ExpressionStatement, config: CodeEmitConfig) {
+  let w = (str: string) => config.write(str);
+  w(`${generateExpression(node.expression, config)};`);
+}
 
 export function emitStatement(node: ts.Statement, config: CodeEmitConfig) {
   switch (node.kind) {
@@ -41,6 +45,9 @@ export function emitStatement(node: ts.Statement, config: CodeEmitConfig) {
       break;
     case ts.SyntaxKind.VariableStatement:
       emitVariableStatement(node as ts.VariableStatement, config);
+      break;
+    case ts.SyntaxKind.ExpressionStatement:
+      emitExpressionStatement(node as ts.ExpressionStatement, config);
       break;
     default:
       throw new NotImplementError(`unhandled statement kind ${node.kind} ${ts.SyntaxKind[node.kind]}`);
