@@ -27,7 +27,7 @@ describe("basic function", () => {
       `
       "
       auto ts_start() -> ts_builtin::ts_type_t<ts_void> {
-        ts_builtin::StackManagerRaii raii{};
+        ts_builtin::StackManager ts_builtin_stack_manager{};
         return;
       }
       "
@@ -37,8 +37,8 @@ describe("basic function", () => {
       `
       "
       auto ts_start() -> ts_builtin::ts_type_t<ts_number> {
-        ts_builtin::StackManagerRaii raii{};
-        return 0;
+        ts_builtin::StackManager ts_builtin_stack_manager{};
+        return ts_builtin::store_return(ts_builtin_stack_manager, 0);
       }
       "
     `
@@ -47,8 +47,8 @@ describe("basic function", () => {
       `
       "
       auto ts_start() -> ts_builtin::ts_type_t<ts_number> {
-        ts_builtin::StackManagerRaii raii{};
-        return 0;
+        ts_builtin::StackManager ts_builtin_stack_manager{};
+        return ts_builtin::store_return(ts_builtin_stack_manager, 0);
       }
       "
     `
@@ -57,8 +57,8 @@ describe("basic function", () => {
       `
       "
       auto ts_add(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
-        ts_builtin::StackManagerRaii raii{};
-        return ts_builtin::_plus_token(ts_a, ts_b);
+        ts_builtin::StackManager ts_builtin_stack_manager{};
+        return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_plus_token(ts_a, ts_b));
       }
       "
     `
@@ -81,7 +81,7 @@ describe("basic class", () => {
       struct ts_A : public ts_builtin::GcObject {
         ts_builtin::ts_type_t<ts_number> ts_a;
         ts_builtin::ts_type_t<ts_string> ts_b;
-        void ts_gc_visit_all_children() const override;
+        void ts_builtin_gc_visit_all_children() const override;
       };
       "
     `);
@@ -89,7 +89,7 @@ describe("basic class", () => {
       "
       struct ts_A : public ts_builtin::GcObject {
         auto ts_foo() -> ts_builtin::ts_type_t<ts_void>;
-        void ts_gc_visit_all_children() const override;
+        void ts_builtin_gc_visit_all_children() const override;
       };
       "
     `);
@@ -97,7 +97,7 @@ describe("basic class", () => {
       "
       struct ts_A : public ts_builtin::GcObject {
         auto ts_foo() -> ts_builtin::ts_type_t<ts_number>;
-        void ts_gc_visit_all_children() const override;
+        void ts_builtin_gc_visit_all_children() const override;
       };
       "
     `);
@@ -106,7 +106,7 @@ describe("basic class", () => {
   test("class definition", () => {
     expect(transpilerClassDefinition(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
       "
-      void ts_A::ts_gc_visit_all_children() const {
+      void ts_A::ts_builtin_gc_visit_all_children() const {
         ts_builtin::gc_visit(this->ts_a);
         ts_builtin::gc_visit(this->ts_b);
       }
@@ -115,9 +115,9 @@ describe("basic class", () => {
     expect(transpilerClassDefinition(`class A { foo () {} }`)).toMatchInlineSnapshot(`
       "
       auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_void> {
-        ts_builtin::StackManagerRaii raii{};
+        ts_builtin::StackManager ts_builtin_stack_manager{};
       }
-      void ts_A::ts_gc_visit_all_children() const {
+      void ts_A::ts_builtin_gc_visit_all_children() const {
       }
       "
     `);
@@ -131,14 +131,14 @@ describe("basic class", () => {
     ).toMatchInlineSnapshot(`
       "
       auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_number> {
-        ts_builtin::StackManagerRaii raii{};
-        return 1;
+        ts_builtin::StackManager ts_builtin_stack_manager{};
+        return ts_builtin::store_return(ts_builtin_stack_manager, 1);
       }
       auto ts_A::ts_bar(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
-        ts_builtin::StackManagerRaii raii{};
-        return ts_builtin::_plus_token(ts_a, ts_b);
+        ts_builtin::StackManager ts_builtin_stack_manager{};
+        return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_plus_token(ts_a, ts_b));
       }
-      void ts_A::ts_gc_visit_all_children() const {
+      void ts_A::ts_builtin_gc_visit_all_children() const {
       }
       "
     `);
@@ -157,8 +157,8 @@ describe("basic expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
-          ts_builtin::StackManagerRaii raii{};
-          return ts_builtin::_plus_token(ts_a, ts_b);
+          ts_builtin::StackManager ts_builtin_stack_manager{};
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_plus_token(ts_a, ts_b));
         }
         "
       `);
@@ -172,8 +172,8 @@ describe("basic expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
-          ts_builtin::StackManagerRaii raii{};
-          return ts_builtin::_minus_token(ts_a, ts_b);
+          ts_builtin::StackManager ts_builtin_stack_manager{};
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_minus_token(ts_a, ts_b));
         }
         "
       `);
@@ -189,8 +189,8 @@ describe("basic expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
-          ts_builtin::StackManagerRaii raii{};
-          return ts_builtin::_exclamation_equals_equals_token(ts_a, ts_b);
+          ts_builtin::StackManager ts_builtin_stack_manager{};
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_exclamation_equals_equals_token(ts_a, ts_b));
         }
         "
       `);
@@ -203,8 +203,8 @@ describe("basic expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
-          ts_builtin::StackManagerRaii raii{};
-          return ts_builtin::_equals_equals_equals_token(ts_a, ts_b);
+          ts_builtin::StackManager ts_builtin_stack_manager{};
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_equals_equals_equals_token(ts_a, ts_b));
         }
         "
       `);
@@ -218,8 +218,8 @@ describe("basic expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
-          ts_builtin::StackManagerRaii raii{};
-          return ts_builtin::_question_question_token(ts_a, ts_b);
+          ts_builtin::StackManager ts_builtin_stack_manager{};
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_question_question_token(ts_a, ts_b));
         }
         "
       `);
@@ -237,8 +237,8 @@ describe("basic expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_never> {
-          ts_builtin::StackManagerRaii raii{};
-          return ts_f(ts_a, ts_b);
+          ts_builtin::StackManager ts_builtin_stack_manager{};
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_f(ts_a, ts_b));
         }
         "
       `);

@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-struct ts_void {};
+using ts_void = void;
 using ts_number = double;
 
 namespace ts_builtin {

@@ -11,8 +11,8 @@ describe("new expression", () => {
     ).toMatchInlineSnapshot(`
       "
       auto ts_f() -> ts_builtin::ts_type_t<ts_A> {
-        ts_builtin::StackManagerRaii raii{};
-        return ts_builtin::create_object(new ts_A());
+        ts_builtin::StackManager ts_builtin_stack_manager{};
+        return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::create_object(new ts_A()));
       }
       "
     `);
@@ -26,8 +26,8 @@ describe("new expression", () => {
     ).toMatchInlineSnapshot(`
       "
       auto ts_f() -> ts_builtin::ts_type_t<ts_A> {
-        ts_builtin::StackManagerRaii raii{};
-        return ts_builtin::create_object(new ts_A(1,2,3));
+        ts_builtin::StackManager ts_builtin_stack_manager{};
+        return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::create_object(new ts_A(1,2,3)));
       }
       "
     `);

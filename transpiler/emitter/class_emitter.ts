@@ -5,7 +5,7 @@ import { NotImplementError } from "../error.js";
 import { generateTypeByNode } from "./type_generator.js";
 import { emitMethodDeclaration, emitMethodDefinition } from "./function_emitter.js";
 import { indent } from "./indent.js";
-import { gcObjClass, gcVisitFn } from "./builtin/gc.js";
+import { gcObjClass, gcVisitAllChildrenFn, gcVisitFn } from "./builtin/gc.js";
 
 function getClassName(node: ts.ClassDeclaration, config: CodeEmitConfig): string {
   if (node.name == undefined) throw new NotImplementError();
@@ -34,7 +34,7 @@ export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmit
       throw new NotImplementError(ts.SyntaxKind[member.kind]);
     }
   });
-  indent(w)(`void ts_gc_visit_all_children() const override;`);
+  indent(w)(`void ${gcVisitAllChildrenFn}() const override;`);
   w(`};`);
 }
 
@@ -51,7 +51,7 @@ export function emitClassDefinition(node: ts.ClassDeclaration, config: CodeEmitC
 
 function emitVisitOverride(node: ts.ClassDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
-  w(`void ${getClassName(node, config)}::ts_gc_visit_all_children() const {`);
+  w(`void ${getClassName(node, config)}::${gcVisitAllChildrenFn}() const {`);
   node.members.forEach((member) => {
     if (ts.isPropertyDeclaration(member)) {
       if (ts.isIdentifier(member.name)) {
