@@ -6,7 +6,6 @@ export function emitFunctionEntryRaii(config: CodeEmitConfig) {
   w(`ts_builtin::StackManager ${gcStackManagerVariant}{};`);
 }
 
-export const gcCreateObjectFn = `ts_builtin::create_object`;
 export const gcStoreReturnFn = `ts_builtin::store_return`;
 export const gcVisitFn = `ts_builtin::gc_visit`;
 

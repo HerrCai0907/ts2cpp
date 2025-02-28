@@ -1,7 +1,6 @@
 import { ts } from "@ts-morph/bootstrap";
 import { NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
-import { gcCreateObjectFn } from "./builtin/gc.js";
 import { generateRawTypeByTypeNode } from "./type_generator.js";
 
 export function generateExpression(node: ts.Expression, config: CodeEmitConfig): string {
@@ -29,7 +28,7 @@ function generateBinaryOperatorBuiltinFunc(token: ts.BinaryOperatorToken, _: Cod
 function generateBinaryExpression(node: ts.BinaryExpression, config: CodeEmitConfig): string {
   return `${generateBinaryOperatorBuiltinFunc(node.operatorToken, config)}(${generateExpression(
     node.left,
-    config,
+    config
   )}, ${generateExpression(node.right, config)})`;
 }
 
@@ -41,6 +40,5 @@ function generateCallExpression(node: ts.CallExpression, config: CodeEmitConfig)
 function generateNewExpression(node: ts.NewExpression, config: CodeEmitConfig): string {
   const args = node.arguments?.map((v) => generateExpression(v, config)).join(",") ?? "";
   const type = generateRawTypeByTypeNode(node.expression, config);
-  const ptrExpr = `new ${type}(${args})`;
-  return `${gcCreateObjectFn}(${ptrExpr})`;
+  return `new ${type}(${args})`;
 }

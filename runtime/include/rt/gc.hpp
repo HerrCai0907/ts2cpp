@@ -7,6 +7,7 @@ namespace ts_builtin {
 
 struct GcObject {
   uint32_t m_color = 0U;
+  GcObject() noexcept;
   virtual ~GcObject() = default;
   virtual void ts_builtin_gc_visit_all_children() const = 0;
   void ts_builtin_gc_visit();
@@ -52,11 +53,6 @@ struct StackManager {
 private:
   void set_return_value_impl(GcObject *obj) noexcept;
 };
-
-template <IsGcObject T> T *create_object(T *ptr) {
-  gc_root.push(ptr);
-  return ptr;
-}
 
 template <class T> T store_return(StackManager &manager, T return_value) {
   if constexpr (std::is_pointer_v<T>) {

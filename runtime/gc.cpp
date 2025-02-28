@@ -4,6 +4,8 @@ namespace ts_builtin {
 
 Root gc_root;
 
+GcObject::GcObject() noexcept { gc_root.push(this); }
+
 void GcObject::ts_builtin_gc_visit() {
   this->m_color = gc_root.m_color;
   ts_builtin_gc_visit_all_children();
