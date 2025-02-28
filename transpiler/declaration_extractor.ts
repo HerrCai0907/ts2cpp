@@ -10,6 +10,7 @@ export class DeclarationExtractor {
   funcs = new Array<ts.FunctionDeclaration>();
   records = new Array<ts.ClassDeclaration>();
   globals = new Array<ts.VariableDeclaration>();
+  init = new Array<ts.Statement>();
 
   private _ident = "";
 
@@ -40,11 +41,14 @@ export class DeclarationExtractor {
         break;
       case SyntaxKind.VariableStatement:
         this.globals.push(...(node as ts.VariableStatement).declarationList.declarations);
+        this.init.push(node as ts.VariableStatement);
         break;
       case SyntaxKind.EndOfFileToken:
         break;
       default:
-        throw new NotImplementError(`Unsupported node kind: ${ts.SyntaxKind[node.kind]}`);
+        if (!ts.isStatement(node)) throw new NotImplementError(`Unsupported node kind: ${ts.SyntaxKind[node.kind]}`);
+        this.init.push(node);
+        break;
     }
     this._endVisit(node);
   }

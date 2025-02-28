@@ -10,7 +10,10 @@ const loader = new SourceLoader();
 loader.loadSource(new Source(sourcePath, readFileSync(sourcePath, "utf-8")));
 
 class Output {
-  constructor(public filePath: string, public code: string) {}
+  constructor(
+    public filePath: string,
+    public code: string,
+  ) {}
 }
 
 let outputs = loader.forEachSource((sourceFile: ts.SourceFile): Output => {
@@ -36,6 +39,7 @@ let outputs = loader.forEachSource((sourceFile: ts.SourceFile): Output => {
   extractor.records.forEach((record) => {
     CodeEmitter.emitClassDeclaration(record, config);
   });
+  CodeEmitter.emitGlobalInit(extractor.init, config);
 
   extractor.funcs.forEach((func) => {
     CodeEmitter.emitFunctionDefinition(func, config);

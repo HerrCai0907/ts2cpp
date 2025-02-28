@@ -25,14 +25,7 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
 }
 
 function generateBinaryOperatorBuiltinFunc(token: ts.BinaryOperatorToken, _: CodeEmitConfig): string {
-  let kind: string;
-  switch (token.kind) {
-    case ts.SyntaxKind.EqualsToken:
-      kind = "EqualsToken";
-      break;
-    default:
-      kind = ts.SyntaxKind[token.kind];
-  }
+  let kind: string = ts.SyntaxKind[token.kind];
   let tokenName = kind.replace(/[A-Z]/g, (r: string) => `_${r.toLowerCase()}`).replace("_token", "");
   return `ts_builtin::binary_operator${tokenName}`;
 }
@@ -62,9 +55,12 @@ function generateBinaryExpression(node: ts.BinaryExpression, config: CodeEmitCon
   if (isBinaryExpressionFieldSet(node)) {
     return generateFieldSetExpression(node, config);
   }
-  const binaryOperator = generateBinaryOperatorBuiltinFunc(node.operatorToken, config);
   const lhs = generateExpression(node.left, config);
   const rhs = generateExpression(node.right, config);
+  if (node.operatorToken.kind == ts.SyntaxKind.EqualsToken) {
+    return `${lhs} = ${rhs}`;
+  }
+  const binaryOperator = generateBinaryOperatorBuiltinFunc(node.operatorToken, config);
   return `${binaryOperator}(${lhs}, ${rhs})`;
 }
 

@@ -1,4 +1,5 @@
 let a = 100;
+a = 1;
 
 class A {
   a: number = 10;
