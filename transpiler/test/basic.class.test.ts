@@ -15,7 +15,11 @@ describe("basic class", () => {
       "
       struct ts_A : public ts_builtin::GcObject {
         ts_builtin::ts_type_t<ts_number> ts_a{};
+        ts_builtin::ts_type_t<ts_number> const& ts_get_a() const noexcept { return this->ts_a; }
+        void ts_set_a(ts_builtin::ts_type_t<ts_number> v) noexcept { this->ts_a = v; }
         ts_builtin::ts_type_t<ts_string> ts_b{};
+        ts_builtin::ts_type_t<ts_string> const& ts_get_b() const noexcept { return this->ts_b; }
+        void ts_set_b(ts_builtin::ts_type_t<ts_string> v) noexcept { this->ts_b = v; }
         void ts_builtin_gc_visit_all_children() const override;
       };
       "
@@ -42,6 +46,8 @@ describe("basic class", () => {
       "
       struct ts_A : public ts_builtin::GcObject {
         ts_builtin::ts_type_t<ts_number> ts_a{10};
+        ts_builtin::ts_type_t<ts_number> const& ts_get_a() const noexcept { return this->ts_a; }
+        void ts_set_a(ts_builtin::ts_type_t<ts_number> v) noexcept { this->ts_a = v; }
         void ts_builtin_gc_visit_all_children() const override;
       };
       "

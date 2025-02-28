@@ -5,5 +5,6 @@ class A {
 
 function f() {
   let a = new A();
-  a;
+  a.a = 1;
+  return a.a;
 }

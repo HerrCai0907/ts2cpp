@@ -1,6 +1,6 @@
 import { ts } from "@ts-morph/bootstrap";
 import { CodeEmitConfig } from "./config.js";
-import { generateIdentifier } from "./identifier_generator.js";
+import { generateGetterIdentifier, generateIdentifier, generateSetterIdentifier } from "./identifier_generator.js";
 import { NotImplementError } from "../error.js";
 import { generateTypeByNode } from "./type_generator.js";
 import { emitMethodDeclaration, emitMethodDefinition } from "./function_emitter.js";
@@ -25,10 +25,7 @@ export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmit
   node.members.forEach((member) => {
     if (ts.isPropertyDeclaration(member)) {
       if (ts.isIdentifier(member.name)) {
-        const initExpr = member.initializer != undefined ? generateExpression(member.initializer, innerConfig) : "";
-        indent(w)(
-          `${generateTypeByNode(member.name, config)} ${generateIdentifier(member.name, config)}{${initExpr}};`
-        );
+        emitField(member, innerConfig);
       } else {
         throw new NotImplementError(ts.SyntaxKind[member.name.kind]);
       }
@@ -51,6 +48,20 @@ export function emitClassDefinition(node: ts.ClassDeclaration, config: CodeEmitC
     }
   });
   emitVisitOverride(node, config);
+}
+
+function emitField(node: ts.PropertyDeclaration, config: CodeEmitConfig) {
+  let w = (str: string) => config.write(str);
+  if (ts.isIdentifier(node.name)) {
+    const initExpr = node.initializer != undefined ? generateExpression(node.initializer, config) : "";
+    const type = generateTypeByNode(node.name, config);
+    const variable = generateIdentifier(node.name, config);
+    w(`${type} ${variable}{${initExpr}};`);
+    w(`${type} const& ${generateGetterIdentifier(node.name, config)}() const noexcept { return this->${variable}; }`);
+    w(`void ${generateSetterIdentifier(node.name, config)}(${type} v) noexcept { this->${variable} = v; }`);
+  } else {
+    throw new NotImplementError(ts.SyntaxKind[node.name.kind]);
+  }
 }
 
 function emitVisitOverride(node: ts.ClassDeclaration, config: CodeEmitConfig) {

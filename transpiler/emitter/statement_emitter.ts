@@ -7,7 +7,6 @@ import { generateTypeByNode } from "./type_generator.js";
 import { generateIdentifier } from "./identifier_generator.js";
 
 function emitBlock(node: ts.Block, config: CodeEmitConfig) {
-  let w = (str: string) => config.write(str);
   for (const statement of node.statements) {
     emitStatement(statement, config);
   }
