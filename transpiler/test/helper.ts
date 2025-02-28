@@ -3,10 +3,7 @@ import { CodeEmitConfig } from "../emitter/config.js";
 import { Source, SourceLoader } from "../source_loader.js";
 import * as CodeEmitter from "../emitter";
 
-function transpiler(
-  code: string,
-  fn: (extractor: DeclarationExtractor, config: CodeEmitConfig) => void
-): string {
+function transpiler(code: string, fn: (extractor: DeclarationExtractor, config: CodeEmitConfig) => void): string {
   const loader = new SourceLoader();
   loader.loadSource(new Source("demo.ts", code));
   let config: CodeEmitConfig = {
@@ -21,7 +18,13 @@ function transpiler(
   });
   return "\n" + output.join("\n") + "\n";
 }
-
+export function transpilerGlobalDefinition(code: string) {
+  return transpiler(code, (extractor, config) => {
+    extractor.globals.forEach((func) => {
+      CodeEmitter.emitGlobalDefinition(func, config);
+    });
+  });
+}
 export function transpilerFunctionDeclaration(code: string) {
   return transpiler(code, (extractor, config) => {
     extractor.funcs.forEach((func) => {

@@ -9,6 +9,7 @@ export class DeclarationExtractor {
 
   funcs = new Array<ts.FunctionDeclaration>();
   records = new Array<ts.ClassDeclaration>();
+  globals = new Array<ts.VariableDeclaration>();
 
   private _ident = "";
 
@@ -36,6 +37,9 @@ export class DeclarationExtractor {
         break;
       case SyntaxKind.ClassDeclaration:
         this.records.push(node as ts.ClassDeclaration);
+        break;
+      case SyntaxKind.VariableStatement:
+        this.globals.push(...(node as ts.VariableStatement).declarationList.declarations);
         break;
       case SyntaxKind.EndOfFileToken:
         break;

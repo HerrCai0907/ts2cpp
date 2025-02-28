@@ -1,3 +1,5 @@
+let a = 100;
+
 class A {
   a: number = 10;
   b: A;
