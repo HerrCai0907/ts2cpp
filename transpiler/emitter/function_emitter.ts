@@ -6,7 +6,7 @@ import { generateTypeByType } from "./type_generator.js";
 import { generateIdentifier } from "./identifier_generator.js";
 import { zip } from "../adt/array.js";
 import { indent } from "./indent.js";
-import { emitFunctionEntryRaii } from "./builtin/gc.js";
+import { emitFunctionEntry } from "./builtin/gc.js";
 
 export function emitFunctionDeclaration(funcNode: ts.FunctionDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
@@ -20,7 +20,7 @@ export function emitFunctionDefinition(funcNode: ts.FunctionDeclaration, config:
   const { name, returnType, parameters } = processFunctionDeclaration(funcNode, config);
   w(`auto ${name}(${parameters}) -> ${returnType} {`);
   const innerConfig = { ...config, write: indent(w) };
-  emitFunctionEntryRaii(innerConfig);
+  emitFunctionEntry(innerConfig);
   emitStatement(funcNode.body, innerConfig);
   w(`}`);
 }
@@ -42,7 +42,7 @@ export function emitMethodDefinition(
   const { name, returnType, parameters } = processFunctionDeclaration(methodNode, config);
   w(`auto ${generateIdentifier(classNode.name, config)}::${name}(${parameters}) -> ${returnType} {`);
   const innerConfig = { ...config, write: indent(w) };
-  emitFunctionEntryRaii(innerConfig);
+  emitFunctionEntry(innerConfig);
   emitStatement(methodNode.body, innerConfig);
   w(`}`);
 }

@@ -1,7 +1,7 @@
 import { CodeEmitConfig } from "../config.js";
 
 export const gcStackManagerVariant = `ts_builtin_stack_manager`;
-export function emitFunctionEntryRaii(config: CodeEmitConfig) {
+export function emitFunctionEntry(config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
   w(`ts_builtin::StackManager ${gcStackManagerVariant}{};`);
 }
