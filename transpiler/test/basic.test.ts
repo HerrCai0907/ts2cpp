@@ -79,8 +79,8 @@ describe("basic class", () => {
     expect(transpilerClassDeclaration(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
       "
       struct ts_A : public ts_builtin::GcObject {
-        ts_builtin::ts_type_t<ts_number> ts_a;
-        ts_builtin::ts_type_t<ts_string> ts_b;
+        ts_builtin::ts_type_t<ts_number> ts_a{};
+        ts_builtin::ts_type_t<ts_string> ts_b{};
         void ts_builtin_gc_visit_all_children() const override;
       };
       "
@@ -97,6 +97,16 @@ describe("basic class", () => {
       "
       struct ts_A : public ts_builtin::GcObject {
         auto ts_foo() -> ts_builtin::ts_type_t<ts_number>;
+        void ts_builtin_gc_visit_all_children() const override;
+      };
+      "
+    `);
+  });
+  test("class declaration with init expr", () => {
+    expect(transpilerClassDeclaration(`class A { a: number = 10; }`)).toMatchInlineSnapshot(`
+      "
+      struct ts_A : public ts_builtin::GcObject {
+        ts_builtin::ts_type_t<ts_number> ts_a{10};
         void ts_builtin_gc_visit_all_children() const override;
       };
       "

@@ -6,6 +6,7 @@ import { generateTypeByNode } from "./type_generator.js";
 import { emitMethodDeclaration, emitMethodDefinition } from "./function_emitter.js";
 import { indent } from "./indent.js";
 import { gcObjClass, gcVisitAllChildrenFn, gcVisitFn } from "./builtin/gc.js";
+import { generateExpression } from "./expression_generator.js";
 
 function getClassName(node: ts.ClassDeclaration, config: CodeEmitConfig): string {
   if (node.name == undefined) throw new NotImplementError();
@@ -24,7 +25,10 @@ export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmit
   node.members.forEach((member) => {
     if (ts.isPropertyDeclaration(member)) {
       if (ts.isIdentifier(member.name)) {
-        indent(w)(`${generateTypeByNode(member.name, config)} ${generateIdentifier(member.name, config)};`);
+        const initExpr = member.initializer != undefined ? generateExpression(member.initializer, innerConfig) : "";
+        indent(w)(
+          `${generateTypeByNode(member.name, config)} ${generateIdentifier(member.name, config)}{${initExpr}};`
+        );
       } else {
         throw new NotImplementError(ts.SyntaxKind[member.name.kind]);
       }
