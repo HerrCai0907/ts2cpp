@@ -14,7 +14,7 @@ describe("basic expression", () => {
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
           ts_builtin::StackManager ts_builtin_stack_manager{};
-          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_plus_token(ts_a, ts_b));
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_plus(ts_a, ts_b));
         }
         "
       `);
@@ -29,7 +29,7 @@ describe("basic expression", () => {
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
           ts_builtin::StackManager ts_builtin_stack_manager{};
-          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_minus_token(ts_a, ts_b));
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_minus(ts_a, ts_b));
         }
         "
       `);
@@ -46,7 +46,7 @@ describe("basic expression", () => {
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
           ts_builtin::StackManager ts_builtin_stack_manager{};
-          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_exclamation_equals_equals_token(ts_a, ts_b));
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_exclamation_equals_equals(ts_a, ts_b));
         }
         "
       `);
@@ -60,7 +60,7 @@ describe("basic expression", () => {
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
           ts_builtin::StackManager ts_builtin_stack_manager{};
-          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_equals_equals_equals_token(ts_a, ts_b));
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_equals_equals_equals(ts_a, ts_b));
         }
         "
       `);
@@ -75,7 +75,7 @@ describe("basic expression", () => {
         "
         auto ts_f(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
           ts_builtin::StackManager ts_builtin_stack_manager{};
-          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_question_question_token(ts_a, ts_b));
+          return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_question_question(ts_a, ts_b));
         }
         "
       `);

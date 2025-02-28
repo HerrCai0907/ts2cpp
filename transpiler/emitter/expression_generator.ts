@@ -21,8 +21,10 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
 }
 
 function generateBinaryOperatorBuiltinFunc(token: ts.BinaryOperatorToken, _: CodeEmitConfig): string {
-  let tokenName = ts.SyntaxKind[token.kind].replace(/[A-Z]/g, (r: string) => `_${r.toLowerCase()}`);
-  return `ts_builtin::${tokenName}`;
+  let tokenName = ts.SyntaxKind[token.kind]
+    .replace(/[A-Z]/g, (r: string) => `_${r.toLowerCase()}`)
+    .replace("_token", "");
+  return `ts_builtin::binary_operator${tokenName}`;
 }
 
 function generateBinaryExpression(node: ts.BinaryExpression, config: CodeEmitConfig): string {

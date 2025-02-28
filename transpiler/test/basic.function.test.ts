@@ -52,7 +52,7 @@ describe("basic function", () => {
       "
       auto ts_add(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
         ts_builtin::StackManager ts_builtin_stack_manager{};
-        return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::_plus_token(ts_a, ts_b));
+        return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_plus(ts_a, ts_b));
       }
       "
     `
