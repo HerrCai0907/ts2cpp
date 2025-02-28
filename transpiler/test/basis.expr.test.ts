@@ -114,7 +114,7 @@ describe("basic expression", () => {
         "
         auto ts_f(ts_builtin::ts_type_t<ts_A> ts_a) -> ts_builtin::ts_type_t<ts_void> {
           ts_builtin::StackManager ts_builtin_stack_manager{};
-          ts_a->ts_get_v();
+          ts_a->_ts_get_v();
         }
         "
       `);
@@ -131,7 +131,7 @@ describe("basic expression", () => {
         "
         auto ts_f(ts_builtin::ts_type_t<ts_A> ts_a) -> ts_builtin::ts_type_t<ts_void> {
           ts_builtin::StackManager ts_builtin_stack_manager{};
-          ts_a->ts_set_v(1);
+          ts_a->_ts_set_v(1);
         }
         "
       `);
