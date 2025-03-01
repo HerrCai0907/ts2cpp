@@ -1,9 +1,13 @@
 let a = 100;
 a = 1;
 
+class B {
+  a: number = 20;
+}
+
 class A {
   a: number = 10;
-  b: A = new A();
+  b: B = new B();
 
   foo() {
     return this.a + this.b.a;
@@ -13,8 +17,7 @@ class A {
 function f() {
   let a = new A();
   a.a = 1;
-  a.foo();
-  return a.a;
+  return a.foo();
 }
 
 console.log(a);
