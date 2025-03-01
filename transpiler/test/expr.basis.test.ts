@@ -1,16 +1,15 @@
 import { describe, test, expect } from "vitest";
 import { transpilerClassDefinition, transpilerFunctionDefinition } from "./helper";
 
-describe("basic expression", () => {
-  describe("binary expression", () => {
-    test("normal operator", () => {
-      expect(
-        transpilerFunctionDefinition(`
+describe("binary expression", () => {
+  test("normal operator", () => {
+    expect(
+      transpilerFunctionDefinition(`
           function f(a:number, b:number) {
             return a + b;
           }
       `),
-      ).toMatchInlineSnapshot(`
+    ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
           builtin::StackManager ts_builtin_stack_manager{};
@@ -21,13 +20,13 @@ describe("basic expression", () => {
         "
       `);
 
-      expect(
-        transpilerFunctionDefinition(`
+    expect(
+      transpilerFunctionDefinition(`
           function f(a:number, b:number) {
             return a - b;
           }
       `),
-      ).toMatchInlineSnapshot(`
+    ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
           builtin::StackManager ts_builtin_stack_manager{};
@@ -37,16 +36,16 @@ describe("basic expression", () => {
         }
         "
       `);
-    });
+  });
 
-    test("ts special operator", () => {
-      expect(
-        transpilerFunctionDefinition(`
+  test("ts special operator", () => {
+    expect(
+      transpilerFunctionDefinition(`
           function f(a:number, b:number) {
             return a !== b;
           }
       `),
-      ).toMatchInlineSnapshot(`
+    ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
           builtin::StackManager ts_builtin_stack_manager{};
@@ -56,13 +55,13 @@ describe("basic expression", () => {
         }
         "
       `);
-      expect(
-        transpilerFunctionDefinition(`
+    expect(
+      transpilerFunctionDefinition(`
           function f(a:number, b:number) {
             return a === b;
           }
     `),
-      ).toMatchInlineSnapshot(`
+    ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
           builtin::StackManager ts_builtin_stack_manager{};
@@ -73,13 +72,13 @@ describe("basic expression", () => {
         "
       `);
 
-      expect(
-        transpilerFunctionDefinition(`
+    expect(
+      transpilerFunctionDefinition(`
           function f(a:number, b:number) {
             return a ?? b;
           }
     `),
-      ).toMatchInlineSnapshot(`
+    ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
           builtin::StackManager ts_builtin_stack_manager{};
@@ -89,18 +88,18 @@ describe("basic expression", () => {
         }
         "
       `);
-    });
   });
+});
 
-  describe("call expression", () => {
-    test("function call", () => {
-      expect(
-        transpilerFunctionDefinition(`
+describe("call expression", () => {
+  test("function call", () => {
+    expect(
+      transpilerFunctionDefinition(`
           function f(a:number, b:number) {
             return f(a, b);
           }
     `),
-      ).toMatchInlineSnapshot(`
+    ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_never> {
           builtin::StackManager ts_builtin_stack_manager{};
@@ -110,19 +109,19 @@ describe("basic expression", () => {
         }
         "
       `);
-    });
   });
+});
 
-  describe("property access expression", () => {
-    test("get", () => {
-      expect(
-        transpilerFunctionDefinition(`
+describe("property access expression", () => {
+  test("get", () => {
+    expect(
+      transpilerFunctionDefinition(`
           class A { v: number; }
           function f(a: A) {
             a.v;
           }
     `),
-      ).toMatchInlineSnapshot(`
+    ).toMatchInlineSnapshot(`
         "
         auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
           builtin::StackManager ts_builtin_stack_manager{};
@@ -132,16 +131,16 @@ describe("basic expression", () => {
         }
         "
       `);
-    });
-    test("set", () => {
-      expect(
-        transpilerFunctionDefinition(`
+  });
+  test("set", () => {
+    expect(
+      transpilerFunctionDefinition(`
           class A { v: number; }
           function f(a: A) {
             a.v = 1;
           }
     `),
-      ).toMatchInlineSnapshot(`
+    ).toMatchInlineSnapshot(`
         "
         auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
           builtin::StackManager ts_builtin_stack_manager{};
@@ -151,18 +150,18 @@ describe("basic expression", () => {
         }
         "
       `);
-    });
   });
+});
 
-  test("method call", () => {
-    expect(
-      transpilerFunctionDefinition(`
+test("method call", () => {
+  expect(
+    transpilerFunctionDefinition(`
         class A { foo() {} }
         function f(a: A) {
           a.foo();
         }
   `),
-    ).toMatchInlineSnapshot(`
+  ).toMatchInlineSnapshot(`
       "
       auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
         builtin::StackManager ts_builtin_stack_manager{};
@@ -172,14 +171,14 @@ describe("basic expression", () => {
       }
       "
     `);
-  });
+});
 
-  test("this expr", () => {
-    expect(
-      transpilerClassDefinition(`
+test("this expr", () => {
+  expect(
+    transpilerClassDefinition(`
         class A { f() { return this; } }
   `),
-    ).toMatchInlineSnapshot(`
+  ).toMatchInlineSnapshot(`
       "
       auto ts_A::ts_f() -> builtin::ts_type_t<ts_this> {
         builtin::StackManager ts_builtin_stack_manager{};
@@ -191,5 +190,4 @@ describe("basic expression", () => {
       }
       "
     `);
-  });
 });
