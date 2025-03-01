@@ -3,7 +3,12 @@ import { CodeEmitConfig } from "./config.js";
 import { generateGetterIdentifier, generateIdentifier, generateSetterIdentifier } from "./identifier_generator.js";
 import { NotImplementError } from "../error.js";
 import { generateTypeByNode } from "./type_generator.js";
-import { emitMethodDeclaration, emitMethodDefinition } from "./function_emitter.js";
+import {
+  emitConstructorDeclaration,
+  emitConstructorDefinition,
+  emitMethodDeclaration,
+  emitMethodDefinition,
+} from "./function_emitter.js";
 import { indent } from "./indent.js";
 import { gcObjClass, gcVisitAllChildrenFn, gcVisitFn } from "./builtin/gc.js";
 import { generateExpression } from "./expression_generator.js";
@@ -31,6 +36,8 @@ export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmit
       }
     } else if (ts.isMethodDeclaration(member)) {
       emitMethodDeclaration(member, innerConfig);
+    } else if (ts.isConstructorDeclaration(member)) {
+      emitConstructorDeclaration(node, member, innerConfig);
     } else {
       throw new NotImplementError(ts.SyntaxKind[member.kind]);
     }
@@ -40,11 +47,12 @@ export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmit
 }
 
 export function emitClassDefinition(node: ts.ClassDeclaration, config: CodeEmitConfig) {
-  let w = (str: string) => config.write(str);
   if (node.name == undefined) throw new NotImplementError();
   node.members.forEach((member) => {
     if (ts.isMethodDeclaration(member)) {
-      emitMethodDefinition(node, member, { ...config, write: w });
+      emitMethodDefinition(node, member, config);
+    } else if (ts.isConstructorDeclaration(member)) {
+      emitConstructorDefinition(node, member, config);
     }
   });
   emitVisitOverride(node, config);

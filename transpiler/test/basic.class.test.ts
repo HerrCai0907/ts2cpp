@@ -1,17 +1,16 @@
-import { describe, test, expect } from "vitest";
+import { test, expect } from "vitest";
 import { transpilerClassDeclaration, transpilerClassDefinition, transpilerClassPreDeclaration } from "./helper";
 
-describe("basic class", () => {
-  test("class pre definition", () => {
-    expect(transpilerClassPreDeclaration("class A {}")).toMatchInlineSnapshot(`
+test("class pre definition", () => {
+  expect(transpilerClassPreDeclaration("class A {}")).toMatchInlineSnapshot(`
       "
       struct ts_A;
       "
     `);
-  });
+});
 
-  test("class declaration", () => {
-    expect(transpilerClassDeclaration(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
+test("class declaration", () => {
+  expect(transpilerClassDeclaration(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
       "
       struct ts_A : public ts_builtin::GcObject {
         ts_builtin::ts_type_t<ts_number> ts_a{};
@@ -24,7 +23,7 @@ describe("basic class", () => {
       };
       "
     `);
-    expect(transpilerClassDeclaration(`class A { foo () {} }`)).toMatchInlineSnapshot(`
+  expect(transpilerClassDeclaration(`class A { foo () {} }`)).toMatchInlineSnapshot(`
       "
       struct ts_A : public ts_builtin::GcObject {
         auto ts_foo() -> ts_builtin::ts_type_t<ts_void>;
@@ -32,7 +31,7 @@ describe("basic class", () => {
       };
       "
     `);
-    expect(transpilerClassDeclaration(`class A { foo () { return 1; } }`)).toMatchInlineSnapshot(`
+  expect(transpilerClassDeclaration(`class A { foo () { return 1; } }`)).toMatchInlineSnapshot(`
       "
       struct ts_A : public ts_builtin::GcObject {
         auto ts_foo() -> ts_builtin::ts_type_t<ts_number>;
@@ -40,9 +39,9 @@ describe("basic class", () => {
       };
       "
     `);
-  });
-  test("class declaration with init expr", () => {
-    expect(transpilerClassDeclaration(`class A { a: number = 10; }`)).toMatchInlineSnapshot(`
+});
+test("class declaration with init expr", () => {
+  expect(transpilerClassDeclaration(`class A { a: number = 10; }`)).toMatchInlineSnapshot(`
       "
       struct ts_A : public ts_builtin::GcObject {
         ts_builtin::ts_type_t<ts_number> ts_a{10};
@@ -52,10 +51,10 @@ describe("basic class", () => {
       };
       "
     `);
-  });
+});
 
-  test("class definition", () => {
-    expect(transpilerClassDefinition(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
+test("class definition", () => {
+  expect(transpilerClassDefinition(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
       "
       void ts_A::ts_builtin_gc_visit_all_children() const {
         ts_builtin::gc_visit(this->ts_a);
@@ -63,7 +62,7 @@ describe("basic class", () => {
       }
       "
     `);
-    expect(transpilerClassDefinition(`class A { foo () {} }`)).toMatchInlineSnapshot(`
+  expect(transpilerClassDefinition(`class A { foo () {} }`)).toMatchInlineSnapshot(`
       "
       auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_void> {
         ts_builtin::StackManager ts_builtin_stack_manager{};
@@ -72,14 +71,14 @@ describe("basic class", () => {
       }
       "
     `);
-    expect(
-      transpilerClassDefinition(`
+  expect(
+    transpilerClassDefinition(`
       class A {
         foo() { return 1; }
         bar(a: number, b: number) { return a + b; }
       }
-      `)
-    ).toMatchInlineSnapshot(`
+      `),
+  ).toMatchInlineSnapshot(`
       "
       auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_number> {
         ts_builtin::StackManager ts_builtin_stack_manager{};
@@ -93,5 +92,4 @@ describe("basic class", () => {
       }
       "
     `);
-  });
 });

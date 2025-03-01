@@ -3,7 +3,7 @@ a = 1;
 
 class A {
   a: number = 10;
-  b: A;
+  b: A = new A();
 
   foo() {
     return this.a + this.b.a;
@@ -18,3 +18,4 @@ function f() {
 }
 
 console.log(a);
+console.log(f());

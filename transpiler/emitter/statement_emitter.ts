@@ -7,6 +7,7 @@ import { generateTypeByNode } from "./type_generator.js";
 import { generateIdentifier } from "./identifier_generator.js";
 
 function emitBlock(node: ts.Block, config: CodeEmitConfig) {
+  // FIXME: {}
   for (const statement of node.statements) {
     emitStatement(statement, config);
   }
