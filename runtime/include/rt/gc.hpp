@@ -1,8 +1,14 @@
 #pragma once
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <type_traits>
+
+#ifndef SHADOW_STACK_SIZE
+#define SHADOW_STACK_SIZE 1024
+#endif
 
 namespace ts_builtin {
 
@@ -26,12 +32,14 @@ template <class T> void gc_visit(T obj) {
     // normal type, ignore
   }
 }
+
 struct Root {
-  GcObject *m_shadowstack[1024];
+  GcObject *m_shadowstack[SHADOW_STACK_SIZE];
   size_t m_index = 0U;
   uint32_t m_color = 0U;
 
   void push(GcObject *ref) noexcept {
+    assert(m_index < SHADOW_STACK_SIZE && "stack overflow");
     m_shadowstack[m_index] = ref;
     m_index++;
   }
