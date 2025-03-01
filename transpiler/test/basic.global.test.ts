@@ -8,7 +8,7 @@ describe("basic global", () => {
       "
       static ts_number ts_a{};
       "
-    `
+    `,
     );
   });
 });

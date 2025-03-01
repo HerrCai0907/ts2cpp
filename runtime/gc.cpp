@@ -1,6 +1,6 @@
 #include "rt/gc.hpp"
 
-namespace ts_builtin {
+namespace ts::builtin {
 
 Root gc_root;
 
@@ -42,4 +42,4 @@ StackManager::~StackManager() noexcept {
   gc_root.m_index = new_frame_pointer;
 }
 
-} // namespace ts_builtin
+} // namespace ts::builtin

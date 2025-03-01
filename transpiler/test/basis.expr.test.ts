@@ -13,9 +13,9 @@ describe("basic expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
-          ts_builtin::StackManager ts_builtin_stack_manager{};
+          builtin::StackManager ts_builtin_stack_manager{};
           {
-            return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_plus(ts_a, ts_b));
+            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_plus(ts_a, ts_b));
           }
         }
         "
@@ -30,9 +30,9 @@ describe("basic expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
-          ts_builtin::StackManager ts_builtin_stack_manager{};
+          builtin::StackManager ts_builtin_stack_manager{};
           {
-            return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_minus(ts_a, ts_b));
+            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_minus(ts_a, ts_b));
           }
         }
         "
@@ -48,10 +48,10 @@ describe("basic expression", () => {
       `),
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
-          ts_builtin::StackManager ts_builtin_stack_manager{};
+        auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
+          builtin::StackManager ts_builtin_stack_manager{};
           {
-            return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_exclamation_equals_equals(ts_a, ts_b));
+            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_exclamation_equals_equals(ts_a, ts_b));
           }
         }
         "
@@ -64,10 +64,10 @@ describe("basic expression", () => {
     `),
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_builtin::ts_type_t<ts_boolean> {
-          ts_builtin::StackManager ts_builtin_stack_manager{};
+        auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
+          builtin::StackManager ts_builtin_stack_manager{};
           {
-            return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_equals_equals_equals(ts_a, ts_b));
+            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_equals_equals_equals(ts_a, ts_b));
           }
         }
         "
@@ -82,9 +82,9 @@ describe("basic expression", () => {
       ).toMatchInlineSnapshot(`
         "
         auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
-          ts_builtin::StackManager ts_builtin_stack_manager{};
+          builtin::StackManager ts_builtin_stack_manager{};
           {
-            return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_question_question(ts_a, ts_b));
+            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_question_question(ts_a, ts_b));
           }
         }
         "
@@ -102,10 +102,10 @@ describe("basic expression", () => {
     `),
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_builtin::ts_type_t<ts_never> {
-          ts_builtin::StackManager ts_builtin_stack_manager{};
+        auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_never> {
+          builtin::StackManager ts_builtin_stack_manager{};
           {
-            return ts_builtin::store_return(ts_builtin_stack_manager, ts_f(ts_a, ts_b));
+            return builtin::store_return(ts_builtin_stack_manager, ts_f(ts_a, ts_b));
           }
         }
         "
@@ -124,8 +124,8 @@ describe("basic expression", () => {
     `),
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_builtin::ts_type_t<ts_A> ts_a) -> ts_void {
-          ts_builtin::StackManager ts_builtin_stack_manager{};
+        auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
+          builtin::StackManager ts_builtin_stack_manager{};
           {
             ts_a->_ts_get_v();
           }
@@ -143,8 +143,8 @@ describe("basic expression", () => {
     `),
       ).toMatchInlineSnapshot(`
         "
-        auto ts_f(ts_builtin::ts_type_t<ts_A> ts_a) -> ts_void {
-          ts_builtin::StackManager ts_builtin_stack_manager{};
+        auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
+          builtin::StackManager ts_builtin_stack_manager{};
           {
             ts_a->_ts_set_v(1);
           }
@@ -164,8 +164,8 @@ describe("basic expression", () => {
   `),
     ).toMatchInlineSnapshot(`
       "
-      auto ts_f(ts_builtin::ts_type_t<ts_A> ts_a) -> ts_void {
-        ts_builtin::StackManager ts_builtin_stack_manager{};
+      auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
+        builtin::StackManager ts_builtin_stack_manager{};
         {
           ts_a->ts_foo();
         }
@@ -181,10 +181,10 @@ describe("basic expression", () => {
   `),
     ).toMatchInlineSnapshot(`
       "
-      auto ts_A::ts_f() -> ts_builtin::ts_type_t<ts_this> {
-        ts_builtin::StackManager ts_builtin_stack_manager{};
+      auto ts_A::ts_f() -> builtin::ts_type_t<ts_this> {
+        builtin::StackManager ts_builtin_stack_manager{};
         {
-          return ts_builtin::store_return(ts_builtin_stack_manager, this);
+          return builtin::store_return(ts_builtin_stack_manager, this);
         }
       }
       void ts_A::ts_builtin_gc_visit_all_children() const {

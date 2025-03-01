@@ -7,13 +7,13 @@ describe("new expression", () => {
       transpilerFunctionDefinition(`
         class A {}
         function f() { return new A(); }
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "
-      auto ts_f() -> ts_builtin::ts_type_t<ts_A> {
-        ts_builtin::StackManager ts_builtin_stack_manager{};
+      auto ts_f() -> builtin::ts_type_t<ts_A> {
+        builtin::StackManager ts_builtin_stack_manager{};
         {
-          return ts_builtin::store_return(ts_builtin_stack_manager, new ts_A());
+          return builtin::store_return(ts_builtin_stack_manager, new ts_A());
         }
       }
       "
@@ -24,13 +24,13 @@ describe("new expression", () => {
       transpilerFunctionDefinition(`
         class A {}
         function f() { return new A(1,2,3); }
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "
-      auto ts_f() -> ts_builtin::ts_type_t<ts_A> {
-        ts_builtin::StackManager ts_builtin_stack_manager{};
+      auto ts_f() -> builtin::ts_type_t<ts_A> {
+        builtin::StackManager ts_builtin_stack_manager{};
         {
-          return ts_builtin::store_return(ts_builtin_stack_manager, new ts_A(1,2,3));
+          return builtin::store_return(ts_builtin_stack_manager, new ts_A(1,2,3));
         }
       }
       "

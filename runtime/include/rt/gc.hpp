@@ -10,7 +10,7 @@
 #define SHADOW_STACK_SIZE 1024
 #endif
 
-namespace ts_builtin {
+namespace ts::builtin {
 
 struct GcObject {
   uint32_t m_color = 0U;
@@ -74,4 +74,4 @@ template <class T> T store_return(StackManager &manager, T return_value) {
   return return_value;
 }
 
-} // namespace ts_builtin
+} // namespace ts::builtin

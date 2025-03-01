@@ -5,7 +5,7 @@
 using ts_void = void;
 using ts_number = double;
 
-namespace ts_builtin {
+namespace ts::builtin {
 
 using size_t = uint32_t;
 
@@ -21,4 +21,4 @@ template <> struct ts_type<ts_void> {
 
 template <class T> using ts_type_t = typename ts_type<T>::type;
 
-} // namespace ts_builtin
+} // namespace ts::builtin

@@ -5,7 +5,7 @@ test("without parameters", () => {
   const code = "class A { constructor() {} }";
   expect(transpilerClassDeclaration(code)).toMatchInlineSnapshot(`
     "
-    struct ts_A : public ts_builtin::GcObject {
+    struct ts_A : public builtin::GcObject {
       explicit ts_A();
       void ts_builtin_gc_visit_all_children() const override;
     };
@@ -15,7 +15,7 @@ test("without parameters", () => {
   expect(transpilerClassDefinition(code)).toMatchInlineSnapshot(`
     "
     ts_A::ts_A() {
-      ts_builtin::StackManager ts_builtin_stack_manager{};
+      builtin::StackManager ts_builtin_stack_manager{};
       {
       }
     }
@@ -29,7 +29,7 @@ test("with parameters", () => {
   const code = "class A { constructor(v: number) {} }";
   expect(transpilerClassDeclaration(code)).toMatchInlineSnapshot(`
     "
-    struct ts_A : public ts_builtin::GcObject {
+    struct ts_A : public builtin::GcObject {
       explicit ts_A(ts_number ts_v);
       void ts_builtin_gc_visit_all_children() const override;
     };
@@ -39,7 +39,7 @@ test("with parameters", () => {
   expect(transpilerClassDefinition(code)).toMatchInlineSnapshot(`
     "
     ts_A::ts_A(ts_number ts_v) {
-      ts_builtin::StackManager ts_builtin_stack_manager{};
+      builtin::StackManager ts_builtin_stack_manager{};
       {
       }
     }
@@ -58,7 +58,7 @@ test("with default initializer", () => {
   `;
   expect(transpilerClassDeclaration(code)).toMatchInlineSnapshot(`
     "
-    struct ts_A : public ts_builtin::GcObject {
+    struct ts_A : public builtin::GcObject {
       ts_number ts_n{};
       ts_number const& _ts_get_n() const noexcept { return this->ts_n; }
       void _ts_set_n(ts_number v) noexcept { this->ts_n = v; }
@@ -71,12 +71,12 @@ test("with default initializer", () => {
   expect(transpilerClassDefinition(code)).toMatchInlineSnapshot(`
     "
     ts_A::ts_A(ts_number ts_v) : ts_n{100} {
-      ts_builtin::StackManager ts_builtin_stack_manager{};
+      builtin::StackManager ts_builtin_stack_manager{};
       {
       }
     }
     void ts_A::ts_builtin_gc_visit_all_children() const {
-      ts_builtin::gc_visit(this->ts_n);
+      builtin::gc_visit(this->ts_n);
     }
     "
   `);

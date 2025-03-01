@@ -32,7 +32,7 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
 function generateBinaryOperatorBuiltinFunc(token: ts.BinaryOperatorToken, _: CodeEmitConfig): string {
   let kind: string = ts.SyntaxKind[token.kind];
   let tokenName = kind.replace(/[A-Z]/g, (r: string) => `_${r.toLowerCase()}`).replace("_token", "");
-  return `ts_builtin::binary_operator${tokenName}`;
+  return `builtin::binary_operator${tokenName}`;
 }
 
 function ignoreParentheses(node: ts.Expression): ts.Expression {

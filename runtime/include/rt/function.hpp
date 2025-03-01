@@ -3,7 +3,7 @@
 #include "rt/gc.hpp"
 #include <tuple>
 
-namespace ts_builtin {
+namespace ts::builtin {
 
 template <class Ret, class... Args> struct ts_func : public GcObject {
   using ret = Ret;
@@ -16,4 +16,4 @@ template <class Ret, class... Args> struct ts_func : public GcObject {
 template <class Ret, class... Args>
 using ts_func_t = typename ts_func<Ret, Args...>::type;
 
-} // namespace ts_builtin
+} // namespace ts::builtin
