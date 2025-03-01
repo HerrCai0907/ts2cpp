@@ -138,6 +138,24 @@ describe("basic expression", () => {
     });
   });
 
+  test("method call", () => {
+    expect(
+      transpilerFunctionDefinition(`
+        class A { foo() {} }
+        function f(a: A) {
+          a.foo();
+        }
+  `),
+    ).toMatchInlineSnapshot(`
+      "
+      auto ts_f(ts_builtin::ts_type_t<ts_A> ts_a) -> ts_builtin::ts_type_t<ts_void> {
+        ts_builtin::StackManager ts_builtin_stack_manager{};
+        ts_a->ts_foo();
+      }
+      "
+    `);
+  });
+
   test("this expr", () => {
     expect(
       transpilerClassDefinition(`

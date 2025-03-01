@@ -4,6 +4,7 @@ import { CodeEmitConfig } from "./config.js";
 import { generateRawTypeByTypeNode } from "./type_generator.js";
 import { generateGetterIdentifier, generateIdentifier, generateSetterIdentifier } from "./identifier_generator.js";
 import assert from "assert";
+import { isAccessMethod, isAccessProperty } from "./symbol_helper.js";
 
 export function generateExpression(node: ts.Expression, config: CodeEmitConfig): string {
   switch (node.kind) {
@@ -38,10 +39,11 @@ function ignoreParentheses(node: ts.Expression): ts.Expression {
   }
   return node;
 }
-function isBinaryExpressionFieldSet(node: ts.BinaryExpression): boolean {
+function isBinaryExpressionSetField(node: ts.BinaryExpression, config: CodeEmitConfig): boolean {
   if (node.operatorToken.kind != ts.SyntaxKind.EqualsToken) return false;
   const left = ignoreParentheses(node.left);
   if (!ts.isPropertyAccessExpression(left)) return false;
+  if (!isAccessProperty(left, config)) throw new NotImplementError("only support property access");
   return true;
 }
 
@@ -54,7 +56,7 @@ function generateFieldSetExpression(node: ts.BinaryExpression, config: CodeEmitC
 }
 
 function generateBinaryExpression(node: ts.BinaryExpression, config: CodeEmitConfig): string {
-  if (isBinaryExpressionFieldSet(node)) {
+  if (isBinaryExpressionSetField(node, config)) {
     return generateFieldSetExpression(node, config);
   }
   const lhs = generateExpression(node.left, config);
@@ -67,8 +69,9 @@ function generateBinaryExpression(node: ts.BinaryExpression, config: CodeEmitCon
 }
 
 function generateCallExpression(node: ts.CallExpression, config: CodeEmitConfig): string {
+  const expr = generateExpression(node.expression, config);
   const args = node.arguments.map((arg) => generateExpression(arg, config)).join(", ");
-  return `${generateExpression(node.expression, config)}(${args})`;
+  return `${expr}(${args})`;
 }
 
 function generateNewExpression(node: ts.NewExpression, config: CodeEmitConfig): string {
@@ -79,5 +82,12 @@ function generateNewExpression(node: ts.NewExpression, config: CodeEmitConfig): 
 
 function generatePropertyAccessExpression(node: ts.PropertyAccessExpression, config: CodeEmitConfig): string {
   if (!ts.isIdentifier(node.name)) throw new NotImplementError("only support identifier property access");
-  return `${generateExpression(node.expression, config)}->${generateGetterIdentifier(node.name, config)}()`;
+  const expr = generateExpression(node.expression, config);
+  if (isAccessMethod(node, config)) {
+    return `${expr}->${generateIdentifier(node.name, config)}`;
+  }
+  if (isAccessProperty(node, config)) {
+    return `${expr}->${generateGetterIdentifier(node.name, config)}()`;
+  }
+  throw new NotImplementError();
 }
