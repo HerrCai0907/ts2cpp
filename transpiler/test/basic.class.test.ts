@@ -11,18 +11,18 @@ test("class pre definition", () => {
 
 test("class declaration", () => {
   expect(transpilerClassDeclaration(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
-      "
-      struct ts_A : public ts_builtin::GcObject {
-        ts_builtin::ts_type_t<ts_number> ts_a{};
-        ts_builtin::ts_type_t<ts_number> const& _ts_get_a() const noexcept { return this->ts_a; }
-        void _ts_set_a(ts_builtin::ts_type_t<ts_number> v) noexcept { this->ts_a = v; }
-        ts_builtin::ts_type_t<ts_string> ts_b{};
-        ts_builtin::ts_type_t<ts_string> const& _ts_get_b() const noexcept { return this->ts_b; }
-        void _ts_set_b(ts_builtin::ts_type_t<ts_string> v) noexcept { this->ts_b = v; }
-        void ts_builtin_gc_visit_all_children() const override;
-      };
-      "
-    `);
+    "
+    struct ts_A : public ts_builtin::GcObject {
+      ts_builtin::ts_type_t<ts_number> ts_a{};
+      ts_builtin::ts_type_t<ts_number> const& _ts_get_a() const noexcept { return this->ts_a; }
+      void _ts_set_a(ts_builtin::ts_type_t<ts_number> v) noexcept { this->ts_a = v; }
+      ts_builtin::ts_type_t<ts_string> ts_b{};
+      ts_builtin::ts_type_t<ts_string> const& _ts_get_b() const noexcept { return this->ts_b; }
+      void _ts_set_b(ts_builtin::ts_type_t<ts_string> v) noexcept { this->ts_b = v; }
+      void ts_builtin_gc_visit_all_children() const override;
+    };
+    "
+  `);
   expect(transpilerClassDeclaration(`class A { foo () {} }`)).toMatchInlineSnapshot(`
       "
       struct ts_A : public ts_builtin::GcObject {
@@ -40,17 +40,27 @@ test("class declaration", () => {
       "
     `);
 });
-test("class declaration with init expr", () => {
-  expect(transpilerClassDeclaration(`class A { a: number = 10; }`)).toMatchInlineSnapshot(`
-      "
-      struct ts_A : public ts_builtin::GcObject {
-        ts_builtin::ts_type_t<ts_number> ts_a{10};
-        ts_builtin::ts_type_t<ts_number> const& _ts_get_a() const noexcept { return this->ts_a; }
-        void _ts_set_a(ts_builtin::ts_type_t<ts_number> v) noexcept { this->ts_a = v; }
-        void ts_builtin_gc_visit_all_children() const override;
-      };
-      "
-    `);
+test("class with init expr", () => {
+  const code = `class A { a: number = 10; }`;
+  expect(transpilerClassDeclaration(code)).toMatchInlineSnapshot(`
+    "
+    struct ts_A : public ts_builtin::GcObject {
+      ts_builtin::ts_type_t<ts_number> ts_a{};
+      ts_builtin::ts_type_t<ts_number> const& _ts_get_a() const noexcept { return this->ts_a; }
+      void _ts_set_a(ts_builtin::ts_type_t<ts_number> v) noexcept { this->ts_a = v; }
+      ts_A();
+      void ts_builtin_gc_visit_all_children() const override;
+    };
+    "
+  `);
+  expect(transpilerClassDefinition(code)).toMatchInlineSnapshot(`
+    "
+    ts_A::ts_A() : ts_a{10} {}
+    void ts_A::ts_builtin_gc_visit_all_children() const {
+      ts_builtin::gc_visit(this->ts_a);
+    }
+    "
+  `);
 });
 
 test("class definition", () => {

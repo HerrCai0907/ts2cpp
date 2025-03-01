@@ -7,6 +7,7 @@ import { generateIdentifier } from "./identifier_generator.js";
 import { zip } from "../adt/array.js";
 import { indent } from "./indent.js";
 import { emitFunctionEntry } from "./builtin/gc.js";
+import { generateExpression } from "./expression_generator.js";
 
 export function emitFunctionDeclaration(funcNode: ts.FunctionDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
@@ -53,31 +54,70 @@ export function emitMethodDefinition(
 
 export function emitConstructorDeclaration(
   classNode: ts.ClassDeclaration,
-  methodNode: ts.ConstructorDeclaration,
+  constructor: ts.ConstructorDeclaration,
   config: CodeEmitConfig,
 ) {
   let w = (str: string) => config.write(str);
   if (classNode.name == undefined) throw new AssertFalse("function body is null");
-  const { parameters } = processFunctionDeclaration(methodNode, config);
+  const { parameters } = processFunctionDeclaration(constructor, config);
   const className = generateIdentifier(classNode.name, config);
   w(`explicit ${className}(${parameters});`);
 }
 
+export function emitDefaultConstructorDeclaration(classNode: ts.ClassDeclaration, config: CodeEmitConfig) {
+  let w = (str: string) => config.write(str);
+  if (classNode.name == undefined) throw new AssertFalse("function body is null");
+  const className = generateIdentifier(classNode.name, config);
+  w(`${className}();`);
+}
+
 export function emitConstructorDefinition(
   classNode: ts.ClassDeclaration,
-  methodNode: ts.ConstructorDeclaration,
+  constructor: ts.ConstructorDeclaration,
+  defaultInit: Array<[ts.Identifier, ts.Expression]>,
   config: CodeEmitConfig,
 ) {
   let w = (str: string) => config.write(str);
-  if (methodNode.body == undefined) throw new AssertFalse("function body is null");
+  if (constructor.body == undefined) throw new AssertFalse("function body is null");
   if (classNode.name == undefined) throw new AssertFalse("class without name");
-  const { parameters } = processFunctionDeclaration(methodNode, config);
+  const { parameters } = processFunctionDeclaration(constructor, config);
   const className = generateIdentifier(classNode.name, config);
-  w(`${className}::${className}(${parameters}) {`);
+
+  if (defaultInit.length == 0) {
+    w(`${className}::${className}(${parameters}) {`);
+  } else {
+    const init = defaultInit
+      .map(([name, initializer]) => {
+        const fieldName = generateIdentifier(name, config);
+        const initExpr = generateExpression(initializer, config);
+        return `${fieldName}{${initExpr}}`;
+      })
+      .join(",");
+    w(`${className}::${className}(${parameters}) : ${init} {`);
+  }
   const innerConfig = { ...config, write: indent(w) };
   emitFunctionEntry(innerConfig);
-  emitStatement(methodNode.body, innerConfig);
+  emitStatement(constructor.body, innerConfig);
   w(`}`);
+}
+
+export function emitDefaultConstructorDefinition(
+  classNode: ts.ClassDeclaration,
+  defaultInit: Array<[ts.Identifier, ts.Expression]>,
+  config: CodeEmitConfig,
+) {
+  let w = (str: string) => config.write(str);
+  if (classNode.name == undefined) throw new AssertFalse("class without name");
+  const className = generateIdentifier(classNode.name, config);
+  if (defaultInit.length == 0) return;
+  const init = defaultInit
+    .map(([name, initializer]) => {
+      const fieldName = generateIdentifier(name, config);
+      const initExpr = generateExpression(initializer, config);
+      return `${fieldName}{${initExpr}}`;
+    })
+    .join(",");
+  w(`${className}::${className}() : ${init} {}`);
 }
 
 function getFunctionDeclarationName(node: ts.FunctionDeclaration | ts.MethodDeclaration, config: CodeEmitConfig) {

@@ -6,6 +6,8 @@ import { generateTypeByNode } from "./type_generator.js";
 import {
   emitConstructorDeclaration,
   emitConstructorDefinition,
+  emitDefaultConstructorDeclaration,
+  emitDefaultConstructorDefinition,
   emitMethodDeclaration,
   emitMethodDefinition,
 } from "./function_emitter.js";
@@ -37,11 +39,21 @@ export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmit
     } else if (ts.isMethodDeclaration(member)) {
       emitMethodDeclaration(member, innerConfig);
     } else if (ts.isConstructorDeclaration(member)) {
-      emitConstructorDeclaration(node, member, innerConfig);
     } else {
       throw new NotImplementError(ts.SyntaxKind[member.kind]);
     }
   });
+
+  const constructor = node.members.find((m) => ts.isConstructorDeclaration(m));
+  if (constructor) {
+    emitConstructorDeclaration(node, constructor, innerConfig);
+  } else {
+    const fieldDefaultInit = extractFieldDefaultInit(node);
+    if (fieldDefaultInit.length > 0) {
+      emitDefaultConstructorDeclaration(node, innerConfig);
+    }
+  }
+
   indent(w)(`void ${gcVisitAllChildrenFn}() const override;`);
   w(`};`);
 }
@@ -51,20 +63,39 @@ export function emitClassDefinition(node: ts.ClassDeclaration, config: CodeEmitC
   node.members.forEach((member) => {
     if (ts.isMethodDeclaration(member)) {
       emitMethodDefinition(node, member, config);
-    } else if (ts.isConstructorDeclaration(member)) {
-      emitConstructorDefinition(node, member, config);
     }
   });
+  emitConstructor(node, config);
   emitVisitOverride(node, config);
+}
+
+function extractFieldDefaultInit(node: ts.ClassDeclaration): Array<[ts.Identifier, ts.Expression]> {
+  const fieldDefaultInit = new Array<[ts.Identifier, ts.Expression]>();
+  node.members.forEach((m) => {
+    if (!ts.isPropertyDeclaration(m)) return;
+    if (!ts.isIdentifier(m.name)) return;
+    if (m.initializer == undefined) return;
+    fieldDefaultInit.push([m.name, m.initializer]);
+  });
+  return fieldDefaultInit;
+}
+
+function emitConstructor(node: ts.ClassDeclaration, config: CodeEmitConfig) {
+  const constructor: ts.ConstructorDeclaration | undefined = node.members.find((m) => ts.isConstructorDeclaration(m));
+  const fieldDefaultInit = extractFieldDefaultInit(node);
+  if (constructor != undefined) {
+    emitConstructorDefinition(node, constructor, fieldDefaultInit, config);
+  } else {
+    emitDefaultConstructorDefinition(node, fieldDefaultInit, config);
+  }
 }
 
 function emitField(node: ts.PropertyDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
   if (ts.isIdentifier(node.name)) {
-    const initExpr = node.initializer != undefined ? generateExpression(node.initializer, config) : "";
     const type = generateTypeByNode(node.name, config);
     const variable = generateIdentifier(node.name, config);
-    w(`${type} ${variable}{${initExpr}};`);
+    w(`${type} ${variable}{};`);
     w(`${type} const& ${generateGetterIdentifier(node.name, config)}() const noexcept { return this->${variable}; }`);
     w(`void ${generateSetterIdentifier(node.name, config)}(${type} v) noexcept { this->${variable} = v; }`);
   } else {
