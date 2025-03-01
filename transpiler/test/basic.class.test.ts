@@ -73,14 +73,16 @@ test("class definition", () => {
       "
     `);
   expect(transpilerClassDefinition(`class A { foo () {} }`)).toMatchInlineSnapshot(`
-      "
-      auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_void> {
-        ts_builtin::StackManager ts_builtin_stack_manager{};
+    "
+    auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_void> {
+      ts_builtin::StackManager ts_builtin_stack_manager{};
+      {
       }
-      void ts_A::ts_builtin_gc_visit_all_children() const {
-      }
-      "
-    `);
+    }
+    void ts_A::ts_builtin_gc_visit_all_children() const {
+    }
+    "
+  `);
   expect(
     transpilerClassDefinition(`
       class A {
@@ -89,17 +91,21 @@ test("class definition", () => {
       }
       `),
   ).toMatchInlineSnapshot(`
-      "
-      auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_number> {
-        ts_builtin::StackManager ts_builtin_stack_manager{};
+    "
+    auto ts_A::ts_foo() -> ts_builtin::ts_type_t<ts_number> {
+      ts_builtin::StackManager ts_builtin_stack_manager{};
+      {
         return ts_builtin::store_return(ts_builtin_stack_manager, 1);
       }
-      auto ts_A::ts_bar(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
-        ts_builtin::StackManager ts_builtin_stack_manager{};
+    }
+    auto ts_A::ts_bar(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
+      ts_builtin::StackManager ts_builtin_stack_manager{};
+      {
         return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_plus(ts_a, ts_b));
       }
-      void ts_A::ts_builtin_gc_visit_all_children() const {
-      }
-      "
-    `);
+    }
+    void ts_A::ts_builtin_gc_visit_all_children() const {
+    }
+    "
+  `);
 });

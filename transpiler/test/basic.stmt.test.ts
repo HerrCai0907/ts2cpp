@@ -13,7 +13,9 @@ describe("basic function", () => {
       "
       auto ts_add(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
         ts_builtin::StackManager ts_builtin_stack_manager{};
-        ts_builtin::ts_type_t<ts_number> ts_a{1};
+        {
+          ts_builtin::ts_type_t<ts_number> ts_a{1};
+        }
       }
       "
     `
@@ -30,7 +32,9 @@ describe("basic function", () => {
       "
       auto ts_add(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
         ts_builtin::StackManager ts_builtin_stack_manager{};
-        ts_builtin::ts_type_t<ts_A> ts_a{new ts_A()};
+        {
+          ts_builtin::ts_type_t<ts_A> ts_a{new ts_A()};
+        }
       }
       "
     `
@@ -48,7 +52,9 @@ describe("basic function", () => {
       "
       auto ts_add(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
         ts_builtin::StackManager ts_builtin_stack_manager{};
-        ts_builtin::binary_operator_plus(1, 2);
+        {
+          ts_builtin::binary_operator_plus(1, 2);
+        }
       }
       "
     `

@@ -5,12 +5,15 @@ import { generateExpression } from "./expression_generator.js";
 import { gcStackManagerVariant, gcStoreReturnFn } from "./builtin/gc.js";
 import { generateTypeByNode } from "./type_generator.js";
 import { generateIdentifier } from "./identifier_generator.js";
+import { indent } from "./indent.js";
 
 function emitBlock(node: ts.Block, config: CodeEmitConfig) {
-  // FIXME: {}
+  let w = (str: string) => config.write(str);
+  w(`{`);
   for (const statement of node.statements) {
-    emitStatement(statement, config);
+    emitStatement(statement, { ...config, write: indent(w) });
   }
+  w(`}`);
 }
 function emitReturnStatement(node: ts.ReturnStatement, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);

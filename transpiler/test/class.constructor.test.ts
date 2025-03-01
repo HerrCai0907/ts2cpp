@@ -16,6 +16,8 @@ test("without parameters", () => {
     "
     ts_A::ts_A() {
       ts_builtin::StackManager ts_builtin_stack_manager{};
+      {
+      }
     }
     void ts_A::ts_builtin_gc_visit_all_children() const {
     }
@@ -38,6 +40,8 @@ test("with parameters", () => {
     "
     ts_A::ts_A(ts_builtin::ts_type_t<ts_number> ts_v) {
       ts_builtin::StackManager ts_builtin_stack_manager{};
+      {
+      }
     }
     void ts_A::ts_builtin_gc_visit_all_children() const {
     }
@@ -68,6 +72,8 @@ test("with default initializer", () => {
     "
     ts_A::ts_A(ts_builtin::ts_type_t<ts_number> ts_v) : ts_n{100} {
       ts_builtin::StackManager ts_builtin_stack_manager{};
+      {
+      }
     }
     void ts_A::ts_builtin_gc_visit_all_children() const {
       ts_builtin::gc_visit(this->ts_n);
