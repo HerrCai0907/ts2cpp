@@ -1,24 +1,32 @@
 import { ts } from "@ts-morph/bootstrap";
 import { CodeEmitConfig } from "./config.js";
 import assert from "assert";
-import { CannotResolveSymbol } from "../error.js";
-import { typeTemplate } from "./builtin/type.js";
+import { CannotResolveSymbol, NotImplementError } from "../error.js";
+import { funcTypeTemplate, typeTemplate } from "./builtin/type.js";
 
 export function generateTypeByNode(node: ts.Node, config: CodeEmitConfig): string {
   let { typeChecker } = config;
   const symbol: ts.Symbol | undefined = typeChecker.getSymbolAtLocation(node);
   if (symbol == undefined) throw new CannotResolveSymbol();
-  const type = typeChecker.getTypeOfSymbol(symbol);
+  return generateTypeBySymbol(symbol, config);
+}
+
+export function generateTypeBySymbol(symbol: ts.Symbol, config: CodeEmitConfig): string {
+  const type = config.typeChecker.getTypeOfSymbol(symbol);
   return generateTypeByType(type, config);
 }
 
 export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): string {
   assert(!type.isLiteral());
-  return generateType(config.typeChecker.typeToString(type));
-}
-
-function generateType(t: string): string {
-  return `${typeTemplate}<ts_${t}>`;
+  const signatures = config.typeChecker.getSignaturesOfType(type, ts.SignatureKind.Call);
+  if (signatures.length != 0) {
+    if (signatures.length > 1) throw new NotImplementError("union type");
+    const sig = signatures[0];
+    const parameterTypes = sig.getParameters().map((p) => generateTypeBySymbol(p, config));
+    const returnType = generateTypeByType(sig.getReturnType(), config);
+    return `${typeTemplate}<${funcTypeTemplate}<${returnType}, ${parameterTypes.join(",")}>>`;
+  }
+  return `${typeTemplate}<ts_${config.typeChecker.typeToString(type)}>`;
 }
 
 export function generateRawTypeByTypeNode(node: ts.Node, config: CodeEmitConfig): string {

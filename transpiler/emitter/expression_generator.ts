@@ -22,6 +22,8 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
       return generatePropertyAccessExpression(node as ts.PropertyAccessExpression, config);
     case ts.SyntaxKind.ThisKeyword:
       return `this`;
+    case ts.SyntaxKind.ArrowFunction:
+      return generateArrowFunction(node as ts.ArrowFunction, config);
     default:
       throw new NotImplementError(`unhandled expression kind ${ts.SyntaxKind[node.kind]}`);
   }
@@ -90,4 +92,8 @@ function generatePropertyAccessExpression(node: ts.PropertyAccessExpression, con
     return `${expr}->${generateGetterIdentifier(node.name, config)}()`;
   }
   throw new NotImplementError();
+}
+
+function generateArrowFunction(node: ts.ArrowFunction, config: CodeEmitConfig): string {
+  return ``;
 }

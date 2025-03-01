@@ -2,7 +2,7 @@ import { ts } from "@ts-morph/bootstrap";
 import { AssertFalse, NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
 import { emitStatement } from "./statement_emitter.js";
-import { generateTypeByType } from "./type_generator.js";
+import { generateTypeBySymbol, generateTypeByType } from "./type_generator.js";
 import { generateIdentifier } from "./identifier_generator.js";
 import { zip } from "../adt/array.js";
 import { indent } from "./indent.js";
@@ -134,7 +134,7 @@ function processFunctionDeclaration(node: ts.SignatureDeclaration, config: CodeE
   const parameters = zip(signature.getParameters(), node.parameters)
     .map(([symbol, decl]) => {
       if (ts.isIdentifier(decl.name)) {
-        const type = generateTypeByType(config.typeChecker.getTypeOfSymbol(symbol), config);
+        const type = generateTypeBySymbol(symbol, config);
         const name = generateIdentifier(decl.name, config);
         return `${type} ${name}`;
       } else {
