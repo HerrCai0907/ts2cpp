@@ -60,3 +60,8 @@ export function transpilerClassDefinition(code: string) {
     });
   });
 }
+export function transpilerGlobalInit(code: string) {
+  return transpiler(code, (extractor, config) => {
+    CodeEmitter.emitGlobalInit(extractor.init, config);
+  });
+}

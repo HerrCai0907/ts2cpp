@@ -16,6 +16,13 @@ export function generateTypeBySymbol(symbol: ts.Symbol, config: CodeEmitConfig):
   return generateTypeByType(type, config);
 }
 
+export function generateRawTypeByTypeNode(node: ts.Node, config: CodeEmitConfig): string {
+  let { typeChecker } = config;
+  const symbol: ts.Symbol | undefined = typeChecker.getSymbolAtLocation(node);
+  if (symbol == undefined) throw new CannotResolveSymbol();
+  return `ts_${symbol.name}`;
+}
+
 export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): string {
   assert(!type.isLiteral());
   const signatures = config.typeChecker.getSignaturesOfType(type, ts.SignatureKind.Call);
@@ -35,11 +42,4 @@ export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): strin
     default:
       return `${typeTemplate}<ts_${typeString}>`;
   }
-}
-
-export function generateRawTypeByTypeNode(node: ts.Node, config: CodeEmitConfig): string {
-  let { typeChecker } = config;
-  const symbol: ts.Symbol | undefined = typeChecker.getSymbolAtLocation(node);
-  if (symbol == undefined) throw new CannotResolveSymbol();
-  return `ts_${symbol.name}`;
 }

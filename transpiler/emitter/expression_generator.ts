@@ -1,10 +1,16 @@
 import { ts } from "@ts-morph/bootstrap";
 import { NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
-import { generateRawTypeByTypeNode } from "./type_generator.js";
+import {
+  generateRawTypeByTypeNode,
+  generateTypeByNode,
+  generateTypeBySymbol,
+  generateTypeByType,
+} from "./type_generator.js";
 import { generateGetterIdentifier, generateIdentifier, generateSetterIdentifier } from "./identifier_generator.js";
 import assert from "assert";
 import { isAccessMethod, isAccessProperty } from "./symbol_helper.js";
+import { emitFunctionExpression } from "./function_emitter.js";
 
 export function generateExpression(node: ts.Expression, config: CodeEmitConfig): string {
   switch (node.kind) {
@@ -95,5 +101,9 @@ function generatePropertyAccessExpression(node: ts.PropertyAccessExpression, con
 }
 
 function generateArrowFunction(node: ts.ArrowFunction, config: CodeEmitConfig): string {
-  return ``;
+  let outputs: string[] = [];
+  const newConfig: CodeEmitConfig = { ...config, write: (s: string) => outputs.push(s) };
+  // FIXME: format
+  emitFunctionExpression(node, newConfig);
+  return outputs.join("\n");
 }

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <type_traits>
+#include <utility>
 
 #ifndef SHADOW_STACK_SIZE
 #define SHADOW_STACK_SIZE 1024
@@ -72,6 +73,18 @@ template <class T> T store_return(StackManager &manager, T return_value) {
     // normal type, ignore
   }
   return return_value;
+}
+
+template <class T, class... Args> T create_object(Args &&...args) {
+  // FIXME: alias two cast
+  if constexpr (std::is_pointer_v<T>) {
+    using E = std::remove_pointer_t<T>;
+    static_assert(std::is_base_of_v<GcObject, E>, "gc only support GcObject");
+    return new E(std::forward<Args>(args)...);
+  } else {
+    using E = typename T::pointee_type;
+    return T{new E(std::forward<Args>(args)...)};
+  }
 }
 
 } // namespace ts::builtin

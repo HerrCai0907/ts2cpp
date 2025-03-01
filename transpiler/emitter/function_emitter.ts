@@ -120,6 +120,22 @@ export function emitDefaultConstructorDefinition(
   w(`${className}::${className}() : ${init} {}`);
 }
 
+export function emitFunctionExpression(node: ts.ArrowFunction, config: CodeEmitConfig) {
+  let w = (str: string) => config.write(str);
+  const type = generateTypeByType(config.typeChecker.getTypeAtLocation(node), config);
+  const { returnType, parameters } = processFunctionDeclaration(node, config);
+  // FIXME: closure gc
+  // FIXME: different behavior with ts for captured number
+  w(`builtin::create_object<${type}>([=] (${parameters}) -> ${returnType} {`);
+  if (ts.isExpression(node.body)) {
+    indent(w)(`return ${generateExpression(node.body, config)};`);
+  } else {
+    emitFunctionEntry(config);
+    emitStatement(node.body, { ...config, write: indent(w) });
+  }
+  w(`})`);
+}
+
 function getFunctionDeclarationName(node: ts.FunctionDeclaration | ts.MethodDeclaration, config: CodeEmitConfig) {
   if (node.name == undefined) throw new NotImplementError();
   if (!ts.isIdentifier(node.name)) throw new NotImplementError();
@@ -127,7 +143,10 @@ function getFunctionDeclarationName(node: ts.FunctionDeclaration | ts.MethodDecl
   return name;
 }
 
-function processFunctionDeclaration(node: ts.SignatureDeclaration, config: CodeEmitConfig) {
+function processFunctionDeclaration(
+  node: ts.SignatureDeclaration,
+  config: CodeEmitConfig,
+): { returnType: string; parameters: string } {
   const signature = config.typeChecker.getSignatureFromDeclaration(node);
   if (signature == undefined) throw new NotImplementError();
   const returnType = generateTypeByType(signature.getReturnType(), config);
