@@ -16,3 +16,5 @@ function f() {
   a.foo();
   return a.a;
 }
+
+console.log(a);

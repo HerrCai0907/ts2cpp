@@ -10,8 +10,12 @@ import { generatedSymbolPrefix } from "./emitter/builtin/runtime.js";
 const sourcePath = "example/demo.ts";
 const loader = new SourceLoader();
 loader.loadSource(new Source(sourcePath, readFileSync(sourcePath, "utf-8")));
-
-let output: string[] = [`#include "rt/operator.hpp"`, `#include "rt/gc.hpp"`, `#include "rt/type.hpp"`];
+let output: string[] = [
+  `#include "rt/console.hpp"`,
+  `#include "rt/gc.hpp"`,
+  `#include "rt/operator.hpp"`,
+  `#include "rt/type.hpp"`,
+];
 const w = (m: string) => output.push(m);
 
 loader.forEachSource((sourceFile: ts.SourceFile): void => {
