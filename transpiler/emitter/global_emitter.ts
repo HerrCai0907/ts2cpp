@@ -4,7 +4,7 @@ import { CodeEmitConfig } from "./config.js";
 import { generateTypeByNode } from "./type_generator.js";
 import { generateIdentifier } from "./identifier_generator.js";
 import { generatedSymbolPrefix } from "./builtin/runtime.js";
-import { indent } from "./indent.js";
+import { indent, indentConfig } from "./indent.js";
 import { generateExpression } from "./expression_generator.js";
 import { emitStatement } from "./statement_emitter.js";
 
@@ -19,7 +19,7 @@ export function emitGlobalInit(nodes: ts.Statement[], config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
   w(`void ${generatedSymbolPrefix}_init() {`);
   nodes.forEach((node) => {
-    const innerConfig = { ...config, write: indent(w) };
+    const innerConfig = indentConfig(config);
     if (ts.isVariableStatement(node)) {
       node.declarationList.declarations.forEach((declaration) => {
         if (declaration.initializer == undefined) return;

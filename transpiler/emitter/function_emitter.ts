@@ -5,7 +5,7 @@ import { emitStatement } from "./statement_emitter.js";
 import { generateTypeBySymbol, generateTypeByType } from "./type_generator.js";
 import { generateIdentifier } from "./identifier_generator.js";
 import { zip } from "../adt/array.js";
-import { indent } from "./indent.js";
+import { indent, indentConfig } from "./indent.js";
 import { emitFunctionEntry } from "./builtin/gc.js";
 import { generateExpression } from "./expression_generator.js";
 
@@ -22,7 +22,7 @@ export function emitFunctionDefinition(funcNode: ts.FunctionDeclaration, config:
   const name = getFunctionDeclarationName(funcNode, config);
   const { returnType, parameters } = processFunctionDeclaration(funcNode, config);
   w(`auto ${name}(${parameters}) -> ${returnType} {`);
-  const innerConfig = { ...config, write: indent(w) };
+  const innerConfig = indentConfig(config);
   emitFunctionEntry(innerConfig);
   emitStatement(funcNode.body, innerConfig);
   w(`}`);
@@ -46,7 +46,7 @@ export function emitMethodDefinition(
   const name = getFunctionDeclarationName(methodNode, config);
   const { returnType, parameters } = processFunctionDeclaration(methodNode, config);
   w(`auto ${generateIdentifier(classNode.name, config)}::${name}(${parameters}) -> ${returnType} {`);
-  const innerConfig = { ...config, write: indent(w) };
+  const innerConfig = indentConfig(config);
   emitFunctionEntry(innerConfig);
   emitStatement(methodNode.body, innerConfig);
   w(`}`);
@@ -95,7 +95,7 @@ export function emitConstructorDefinition(
       .join(",");
     w(`${className}::${className}(${parameters}) : ${init} {`);
   }
-  const innerConfig = { ...config, write: indent(w) };
+  const innerConfig = indentConfig(config);
   emitFunctionEntry(innerConfig);
   emitStatement(constructor.body, innerConfig);
   w(`}`);
@@ -131,7 +131,7 @@ export function emitFunctionExpression(node: ts.ArrowFunction, config: CodeEmitC
     indent(w)(`return ${generateExpression(node.body, config)};`);
   } else {
     emitFunctionEntry(config);
-    emitStatement(node.body, { ...config, write: indent(w) });
+    emitStatement(node.body, indentConfig(config));
   }
   w(`})`);
 }

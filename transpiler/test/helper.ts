@@ -6,10 +6,7 @@ import * as CodeEmitter from "../emitter";
 function transpiler(code: string, fn: (extractor: DeclarationExtractor, config: CodeEmitConfig) => void): string {
   const loader = new SourceLoader();
   loader.loadSource(new Source("demo.ts", code));
-  let config: CodeEmitConfig = {
-    write: (m) => output.push(m),
-    typeChecker: loader.typeChecker,
-  };
+  const config = new CodeEmitConfig((m) => output.push(m), loader.typeChecker);
   let output: string[] = [];
   loader.forEachSource((sourceFile) => {
     let extractor = new DeclarationExtractor();

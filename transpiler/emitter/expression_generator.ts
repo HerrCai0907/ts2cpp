@@ -102,8 +102,16 @@ function generatePropertyAccessExpression(node: ts.PropertyAccessExpression, con
 
 function generateArrowFunction(node: ts.ArrowFunction, config: CodeEmitConfig): string {
   let outputs: string[] = [];
-  const newConfig: CodeEmitConfig = { ...config, write: (s: string) => outputs.push(s) };
-  // FIXME: format
+  const newConfig = new CodeEmitConfig(
+    (str) => {
+      outputs.push(str);
+    },
+    config.typeChecker,
+    0,
+  );
   emitFunctionExpression(node, newConfig);
+  for (let i = 1; i < outputs.length; i++) {
+    outputs[i] = "  ".repeat(config.indentLevel) + outputs[i];
+  }
   return outputs.join("\n");
 }

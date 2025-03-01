@@ -10,15 +10,15 @@ describe("binary expression", () => {
           }
       `),
     ).toMatchInlineSnapshot(`
-        "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
-          builtin::StackManager ts_builtin_stack_manager{};
-          {
-            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_plus(ts_a, ts_b));
-          }
+      "
+      auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+        builtin::StackManager ts_builtin_stack_manager{};
+        {
+          return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_plus(ts_a, ts_b));
         }
-        "
-      `);
+      }
+      "
+    `);
 
     expect(
       transpilerFunctionDefinition(`
@@ -27,15 +27,15 @@ describe("binary expression", () => {
           }
       `),
     ).toMatchInlineSnapshot(`
-        "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
-          builtin::StackManager ts_builtin_stack_manager{};
-          {
-            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_minus(ts_a, ts_b));
-          }
+      "
+      auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+        builtin::StackManager ts_builtin_stack_manager{};
+        {
+          return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_minus(ts_a, ts_b));
         }
-        "
-      `);
+      }
+      "
+    `);
   });
 
   test("ts special operator", () => {
@@ -46,15 +46,15 @@ describe("binary expression", () => {
           }
       `),
     ).toMatchInlineSnapshot(`
-        "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
-          builtin::StackManager ts_builtin_stack_manager{};
-          {
-            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_exclamation_equals_equals(ts_a, ts_b));
-          }
+      "
+      auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
+        builtin::StackManager ts_builtin_stack_manager{};
+        {
+          return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_exclamation_equals_equals(ts_a, ts_b));
         }
-        "
-      `);
+      }
+      "
+    `);
     expect(
       transpilerFunctionDefinition(`
           function f(a:number, b:number) {
@@ -62,15 +62,15 @@ describe("binary expression", () => {
           }
     `),
     ).toMatchInlineSnapshot(`
-        "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
-          builtin::StackManager ts_builtin_stack_manager{};
-          {
-            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_equals_equals_equals(ts_a, ts_b));
-          }
+      "
+      auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
+        builtin::StackManager ts_builtin_stack_manager{};
+        {
+          return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_equals_equals_equals(ts_a, ts_b));
         }
-        "
-      `);
+      }
+      "
+    `);
 
     expect(
       transpilerFunctionDefinition(`
@@ -79,15 +79,15 @@ describe("binary expression", () => {
           }
     `),
     ).toMatchInlineSnapshot(`
-        "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
-          builtin::StackManager ts_builtin_stack_manager{};
-          {
-            return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_question_question(ts_a, ts_b));
-          }
+      "
+      auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_number {
+        builtin::StackManager ts_builtin_stack_manager{};
+        {
+          return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_question_question(ts_a, ts_b));
         }
-        "
-      `);
+      }
+      "
+    `);
   });
 });
 
@@ -100,15 +100,15 @@ describe("call expression", () => {
           }
     `),
     ).toMatchInlineSnapshot(`
-        "
-        auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_never> {
-          builtin::StackManager ts_builtin_stack_manager{};
-          {
-            return builtin::store_return(ts_builtin_stack_manager, ts_f(ts_a, ts_b));
-          }
+      "
+      auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_never> {
+        builtin::StackManager ts_builtin_stack_manager{};
+        {
+          return builtin::store_return(ts_builtin_stack_manager, ts_f(ts_a, ts_b));
         }
-        "
-      `);
+      }
+      "
+    `);
   });
 });
 
@@ -122,15 +122,15 @@ describe("property access expression", () => {
           }
     `),
     ).toMatchInlineSnapshot(`
-        "
-        auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
-          builtin::StackManager ts_builtin_stack_manager{};
-          {
-            ts_a->_ts_get_v();
-          }
+      "
+      auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
+        builtin::StackManager ts_builtin_stack_manager{};
+        {
+          ts_a->_ts_get_v();
         }
-        "
-      `);
+      }
+      "
+    `);
   });
   test("set", () => {
     expect(
@@ -141,15 +141,15 @@ describe("property access expression", () => {
           }
     `),
     ).toMatchInlineSnapshot(`
-        "
-        auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
-          builtin::StackManager ts_builtin_stack_manager{};
-          {
-            ts_a->_ts_set_v(1);
-          }
+      "
+      auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
+        builtin::StackManager ts_builtin_stack_manager{};
+        {
+          ts_a->_ts_set_v(1);
         }
-        "
-      `);
+      }
+      "
+    `);
   });
 });
 
@@ -162,15 +162,15 @@ test("method call", () => {
         }
   `),
   ).toMatchInlineSnapshot(`
-      "
-      auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
-        builtin::StackManager ts_builtin_stack_manager{};
-        {
-          ts_a->ts_foo();
-        }
+    "
+    auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
+      builtin::StackManager ts_builtin_stack_manager{};
+      {
+        ts_a->ts_foo();
       }
-      "
-    `);
+    }
+    "
+  `);
 });
 
 test("this expr", () => {
@@ -179,15 +179,15 @@ test("this expr", () => {
         class A { f() { return this; } }
   `),
   ).toMatchInlineSnapshot(`
-      "
-      auto ts_A::ts_f() -> builtin::ts_type_t<ts_this> {
-        builtin::StackManager ts_builtin_stack_manager{};
-        {
-          return builtin::store_return(ts_builtin_stack_manager, this);
-        }
+    "
+    auto ts_A::ts_f() -> builtin::ts_type_t<ts_this> {
+      builtin::StackManager ts_builtin_stack_manager{};
+      {
+        return builtin::store_return(ts_builtin_stack_manager, this);
       }
-      void ts_A::ts_builtin_gc_visit_all_children() const {
-      }
-      "
-    `);
+    }
+    void ts_A::ts_builtin_gc_visit_all_children() const {
+    }
+    "
+  `);
 });

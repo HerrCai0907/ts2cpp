@@ -11,7 +11,7 @@ import {
   emitMethodDeclaration,
   emitMethodDefinition,
 } from "./function_emitter.js";
-import { indent } from "./indent.js";
+import { indent, indentConfig } from "./indent.js";
 import { gcObjClass, gcVisitAllChildrenFn, gcVisitFn } from "./builtin/gc.js";
 import { generateExpression } from "./expression_generator.js";
 
@@ -28,7 +28,7 @@ export function emitClassPreDeclaration(node: ts.ClassDeclaration, config: CodeE
 export function emitClassDeclaration(node: ts.ClassDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
   w(`struct ${getClassName(node, config)} : public ${gcObjClass} {`);
-  const innerConfig = { ...config, write: indent(w) };
+  const innerConfig = indentConfig(config);
   node.members.forEach((member) => {
     if (ts.isPropertyDeclaration(member)) {
       if (ts.isIdentifier(member.name)) {

@@ -9,15 +9,15 @@ test("declare statement", () => {
         }`),
   ).toMatchInlineSnapshot(
     `
-      "
-      auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
-        builtin::StackManager ts_builtin_stack_manager{};
-        {
-          ts_number ts_a{1};
-        }
+    "
+    auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
+      builtin::StackManager ts_builtin_stack_manager{};
+      {
+        ts_number ts_a{1};
       }
-      "
-    `,
+    }
+    "
+  `,
   );
 
   expect(
@@ -28,15 +28,15 @@ test("declare statement", () => {
         }`),
   ).toMatchInlineSnapshot(
     `
-      "
-      auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
-        builtin::StackManager ts_builtin_stack_manager{};
-        {
-          builtin::ts_type_t<ts_A> ts_a{new ts_A()};
-        }
+    "
+    auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
+      builtin::StackManager ts_builtin_stack_manager{};
+      {
+        builtin::ts_type_t<ts_A> ts_a{new ts_A()};
       }
-      "
-    `,
+    }
+    "
+  `,
   );
 });
 
@@ -48,14 +48,14 @@ test("expression statement", () => {
         }`),
   ).toMatchInlineSnapshot(
     `
-      "
-      auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
-        builtin::StackManager ts_builtin_stack_manager{};
-        {
-          builtin::binary_operator_plus(1, 2);
-        }
+    "
+    auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
+      builtin::StackManager ts_builtin_stack_manager{};
+      {
+        builtin::binary_operator_plus(1, 2);
       }
-      "
-    `,
+    }
+    "
+  `,
   );
 });
