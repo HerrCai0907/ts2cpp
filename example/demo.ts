@@ -1,6 +1,6 @@
 let inc = (n: number) => {
   return (v: number) => {
-    return v + n;
+    return v;
   };
 };
 

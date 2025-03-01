@@ -1,17 +1,16 @@
 #pragma once
 
 #include "rt/gc.hpp"
-#include <tuple>
 
 namespace ts::builtin {
 
-template <class Ret, class... Args> struct Function : public GcObject {
-  using ret = Ret;
-  using args = std::tuple<Args...>;
+template <IsTsType Ret, IsTsType... Args> struct Function : public GcObject {
+  using FnType = Ret (*)(Args...);
+  FnType m_fn;
 
-  auto operator()(Args... args) -> Ret {}
+  Function(FnType fn) : m_fn(fn) {}
 
-  template <class Fn> Function(Fn &&) {}
+  auto operator()(Args... args) -> Ret { return m_fn(args...); }
 
   void ts_builtin_gc_visit_all_children() const override {}
 };

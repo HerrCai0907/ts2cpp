@@ -126,7 +126,7 @@ export function emitFunctionExpression(node: ts.ArrowFunction, config: CodeEmitC
   const { returnType, parameters } = processFunctionDeclaration(node, config);
   // FIXME: closure gc
   // FIXME: different behavior with ts for captured number
-  w(`builtin::create_object<${type}>([=] (${parameters}) -> ${returnType} {`);
+  w(`builtin::create_object<${type}>([] (${parameters}) -> ${returnType} {`);
   if (ts.isExpression(node.body)) {
     indent(w)(`return ${generateExpression(node.body, config)};`);
   } else {
