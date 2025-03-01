@@ -5,13 +5,13 @@ describe("basic function", () => {
   test("function declaration", () => {
     expect(transpilerFunctionDeclaration("function start() {}")).toMatchInlineSnapshot(`
       "
-      auto ts_start() -> ts_builtin::ts_type_t<ts_void>;
+      auto ts_start() -> ts_void;
       "
     `);
     expect(transpilerFunctionDeclaration("function add(a:number, b:number): number {}")).toMatchInlineSnapshot(
       `
       "
-      auto ts_add(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number>;
+      auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number;
       "
     `
     );
@@ -20,7 +20,7 @@ describe("basic function", () => {
     expect(transpilerFunctionDefinition("function start() { return; }")).toMatchInlineSnapshot(
       `
       "
-      auto ts_start() -> ts_builtin::ts_type_t<ts_void> {
+      auto ts_start() -> ts_void {
         ts_builtin::StackManager ts_builtin_stack_manager{};
         {
           return;
@@ -32,7 +32,7 @@ describe("basic function", () => {
     expect(transpilerFunctionDefinition("function start() : number { return 0; }")).toMatchInlineSnapshot(
       `
       "
-      auto ts_start() -> ts_builtin::ts_type_t<ts_number> {
+      auto ts_start() -> ts_number {
         ts_builtin::StackManager ts_builtin_stack_manager{};
         {
           return ts_builtin::store_return(ts_builtin_stack_manager, 0);
@@ -44,7 +44,7 @@ describe("basic function", () => {
     expect(transpilerFunctionDefinition("function start() { return 0; }")).toMatchInlineSnapshot(
       `
       "
-      auto ts_start() -> ts_builtin::ts_type_t<ts_number> {
+      auto ts_start() -> ts_number {
         ts_builtin::StackManager ts_builtin_stack_manager{};
         {
           return ts_builtin::store_return(ts_builtin_stack_manager, 0);
@@ -56,7 +56,7 @@ describe("basic function", () => {
     expect(transpilerFunctionDefinition(`function add(a:number, b:number) { return a + b; }`)).toMatchInlineSnapshot(
       `
       "
-      auto ts_add(ts_builtin::ts_type_t<ts_number> ts_a, ts_builtin::ts_type_t<ts_number> ts_b) -> ts_builtin::ts_type_t<ts_number> {
+      auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
         ts_builtin::StackManager ts_builtin_stack_manager{};
         {
           return ts_builtin::store_return(ts_builtin_stack_manager, ts_builtin::binary_operator_plus(ts_a, ts_b));

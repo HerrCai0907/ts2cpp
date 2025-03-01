@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <tuple>
 
 using ts_void = void;
 using ts_number = double;
@@ -21,10 +20,5 @@ template <> struct ts_type<ts_void> {
 };
 
 template <class T> using ts_type_t = typename ts_type<T>::type;
-
-template <class Ret, class... Args> struct ts_func_type {
-  using ret = Ret;
-  using args = std::tuple<Args...>;
-};
 
 } // namespace ts_builtin

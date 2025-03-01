@@ -6,7 +6,7 @@ describe("basic global", () => {
     expect(transpilerGlobalDefinition(`let a = 1;`)).toMatchInlineSnapshot(
       `
       "
-      static ts_builtin::ts_type_t<ts_number> ts_a{};
+      static ts_number ts_a{};
       "
     `
     );

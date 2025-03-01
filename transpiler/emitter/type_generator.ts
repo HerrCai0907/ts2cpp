@@ -24,9 +24,17 @@ export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): strin
     const sig = signatures[0];
     const parameterTypes = sig.getParameters().map((p) => generateTypeBySymbol(p, config));
     const returnType = generateTypeByType(sig.getReturnType(), config);
-    return `${typeTemplate}<${funcTypeTemplate}<${returnType}, ${parameterTypes.join(",")}>>`;
+    return `${funcTypeTemplate}<${returnType}, ${parameterTypes.join(",")}>`;
   }
-  return `${typeTemplate}<ts_${config.typeChecker.typeToString(type)}>`;
+  const typeString = config.typeChecker.typeToString(type);
+  switch (typeString) {
+    case "void":
+      return `ts_void`;
+    case "number":
+      return `ts_number`;
+    default:
+      return `${typeTemplate}<ts_${typeString}>`;
+  }
 }
 
 export function generateRawTypeByTypeNode(node: ts.Node, config: CodeEmitConfig): string {

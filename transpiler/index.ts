@@ -12,6 +12,7 @@ const loader = new SourceLoader();
 loader.loadSource(new Source(sourcePath, readFileSync(sourcePath, "utf-8")));
 let output: string[] = [
   `#include "rt/console.hpp"`,
+  `#include "rt/function.hpp"`,
   `#include "rt/gc.hpp"`,
   `#include "rt/operator.hpp"`,
   `#include "rt/type.hpp"`,
