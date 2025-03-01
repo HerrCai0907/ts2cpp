@@ -126,14 +126,17 @@ export function emitFunctionExpression(node: ts.ArrowFunction, config: CodeEmitC
   const { returnType, parameters } = processFunctionDeclaration(node, config);
   // FIXME: closure gc
   // FIXME: different behavior with ts for captured number
-  w(`builtin::create_object<${type}>([] (${parameters}) -> ${returnType} {`);
+  w(`builtin::create_object<${type}>(`);
+  indent(w)(`[] (${parameters}) -> ${returnType} {`);
   if (ts.isExpression(node.body)) {
-    indent(w)(`return ${generateExpression(node.body, config)};`);
+    indent(indent(w))(`return ${generateExpression(node.body, config)};`);
   } else {
-    emitFunctionEntry(config);
-    emitStatement(node.body, indentConfig(config));
+    const innerConfig = indentConfig(config, 2);
+    emitFunctionEntry(innerConfig);
+    emitStatement(node.body, innerConfig);
   }
-  w(`})`);
+  indent(w)(`}`);
+  w(`)`);
 }
 
 function getFunctionDeclarationName(node: ts.FunctionDeclaration | ts.MethodDeclaration, config: CodeEmitConfig) {
