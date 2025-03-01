@@ -7,8 +7,10 @@ Root gc_root;
 GcObject::GcObject() noexcept { gc_root.push(this); }
 
 void GcObject::ts_builtin_gc_visit() {
-  this->m_color = gc_root.m_color;
-  ts_builtin_gc_visit_all_children();
+  if (this->m_color != gc_root.m_color) {
+    this->m_color = gc_root.m_color;
+    ts_builtin_gc_visit_all_children();
+  }
 }
 
 StackManager::StackManager() noexcept
