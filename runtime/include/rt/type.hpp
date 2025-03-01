@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rt/gc.hpp"
 #include <cstdint>
 
 using ts_void = void;
@@ -9,8 +10,10 @@ namespace ts::builtin {
 
 using size_t = uint32_t;
 
-template <class T> struct ts_type {
-  using type = T *;
+template <class T> struct ts_type;
+
+template <IsGcObject T> struct ts_type<T> {
+  using type = GcRef<T>;
 };
 template <> struct ts_type<ts_number> {
   using type = ts_number;

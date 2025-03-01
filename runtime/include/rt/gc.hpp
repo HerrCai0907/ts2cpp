@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rt/basic_type.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -24,10 +25,27 @@ struct GcObject {
 template <class T>
 concept IsGcObject = std::is_base_of_v<GcObject, T>;
 
-template <class T> void gc_visit(T obj) {
-  if constexpr (std::is_pointer_v<T>) {
-    static_assert(std::is_base_of_v<GcObject, std::remove_pointer_t<T>>,
-                  "gc only support GcObject*");
+template <IsGcObject T> struct GcRef {
+  using pointee_type = T;
+  pointee_type *m_pointer;
+
+  pointee_type operator->() const noexcept { return m_pointer; }
+};
+
+template <class T>
+concept IsGcRef = requires {
+  typename T::pointee_type;
+  requires IsGcObject<typename T::pointee_type>;
+};
+template <class T> struct is_gc_ref : public std::false_type {};
+template <IsGcRef T> struct is_gc_ref<T> : public std::true_type {};
+template <class T> static constexpr bool is_gc_ref_v = is_gc_ref<T>::value;
+
+template <class T>
+concept IsTsType = IsGcRef<T> || std::is_same_v<T, ts_number>;
+
+template <IsTsType T> void gc_visit(T obj) {
+  if constexpr (is_gc_ref_v<T>) {
     obj->ts_builtin_gc_visit();
   } else {
     // normal type, ignore
@@ -53,10 +71,8 @@ struct StackManager {
   StackManager() noexcept;
   ~StackManager() noexcept;
 
-  template <IsGcObject T> T *set_return_value(T *obj) noexcept {
-    static_assert(std::is_base_of_v<GcObject, std::remove_pointer_t<T>>,
-                  "gc only support GcObject*");
-    set_return_value_impl(obj);
+  template <IsGcRef T> T set_return_value(T obj) noexcept {
+    set_return_value_impl(obj.m_pointer);
     return obj;
   }
 
@@ -64,10 +80,8 @@ private:
   void set_return_value_impl(GcObject *obj) noexcept;
 };
 
-template <class T> T store_return(StackManager &manager, T return_value) {
-  if constexpr (std::is_pointer_v<T>) {
-    static_assert(std::is_base_of_v<GcObject, std::remove_pointer_t<T>>,
-                  "gc only support GcObject*");
+template <IsTsType T> T store_return(StackManager &manager, T return_value) {
+  if constexpr (is_gc_ref_v<T>) {
     return manager.set_return_value(return_value);
   } else {
     // normal type, ignore
@@ -75,16 +89,9 @@ template <class T> T store_return(StackManager &manager, T return_value) {
   return return_value;
 }
 
-template <class T, class... Args> T create_object(Args &&...args) {
-  // FIXME: alias two cast
-  if constexpr (std::is_pointer_v<T>) {
-    using E = std::remove_pointer_t<T>;
-    static_assert(std::is_base_of_v<GcObject, E>, "gc only support GcObject");
-    return new E(std::forward<Args>(args)...);
-  } else {
-    using E = typename T::pointee_type;
-    return T{new E(std::forward<Args>(args)...)};
-  }
+template <IsTsType T, class... Args> T create_object(Args &&...args) {
+  using E = typename T::pointee_type;
+  return T{new E(std::forward<Args>(args)...)};
 }
 
 } // namespace ts::builtin
