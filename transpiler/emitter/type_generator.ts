@@ -31,7 +31,8 @@ export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): strin
     const sig = signatures[0];
     const parameterTypes = sig.getParameters().map((p) => generateTypeBySymbol(p, config));
     const returnType = generateTypeByType(sig.getReturnType(), config);
-    return `${funcTypeTemplate}<${returnType}, ${parameterTypes.join(",")}>`;
+    const parameters = parameterTypes.map((t) => `,${t}`).join("");
+    return `${funcTypeTemplate}<${returnType}${parameters}>`;
   }
   const typeString = config.typeChecker.typeToString(type);
   switch (typeString) {
