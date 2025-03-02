@@ -89,7 +89,7 @@ template <IsTsType T> T store_return(StackManager &manager, T return_value) {
   return return_value;
 }
 
-template <IsTsType T, class... Args> T create_object(Args &&...args) {
+template <IsTsType T, class... Args> T gc_create_object(Args &&...args) {
   using E = typename T::pointee_type;
   return T{new E(std::forward<Args>(args)...)};
 }

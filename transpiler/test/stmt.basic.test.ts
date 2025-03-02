@@ -32,7 +32,7 @@ test("declare statement", () => {
     auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
       builtin::StackManager ts_builtin_stack_manager{};
       {
-        builtin::ts_type_t<ts_A> ts_a{new ts_A()};
+        builtin::ts_type_t<ts_A> ts_a{builtin::gc_create_object<builtin::ts_type_t<ts_A>>()};
       }
     }
     "

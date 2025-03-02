@@ -1,16 +1,12 @@
 import { ts } from "@ts-morph/bootstrap";
 import { NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
-import {
-  generateRawTypeByTypeNode,
-  generateTypeByNode,
-  generateTypeBySymbol,
-  generateTypeByType,
-} from "./type_generator.js";
 import { generateGetterIdentifier, generateIdentifier, generateSetterIdentifier } from "./identifier_generator.js";
 import assert from "assert";
 import { isAccessMethod, isAccessProperty } from "./symbol_helper.js";
 import { emitFunctionExpression } from "./function_emitter.js";
+import { gcCreateObjectFn } from "./builtin/gc.js";
+import { generateContextualTypeByExpression, generateTypeByNode, generateTypeByType } from "./type_generator.js";
 
 export function generateExpression(node: ts.Expression, config: CodeEmitConfig): string {
   switch (node.kind) {
@@ -84,8 +80,8 @@ function generateCallExpression(node: ts.CallExpression, config: CodeEmitConfig)
 
 function generateNewExpression(node: ts.NewExpression, config: CodeEmitConfig): string {
   const args = node.arguments?.map((v) => generateExpression(v, config)).join(",") ?? "";
-  const type = generateRawTypeByTypeNode(node.expression, config);
-  return `new ${type}(${args})`;
+  const type = generateContextualTypeByExpression(node, config);
+  return `${gcCreateObjectFn}<${type}>(${args})`;
 }
 
 function generatePropertyAccessExpression(node: ts.PropertyAccessExpression, config: CodeEmitConfig): string {

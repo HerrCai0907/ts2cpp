@@ -6,4 +6,4 @@ let inc = (n: A) => {
   };
 };
 
-console.log(inc(1)(2)); // 3
+console.log(inc(new A())(2)); // 3

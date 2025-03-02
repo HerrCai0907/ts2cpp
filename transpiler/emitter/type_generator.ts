@@ -12,16 +12,15 @@ export function generateTypeByNode(node: ts.Node, config: CodeEmitConfig): strin
   return generateTypeBySymbol(symbol, config);
 }
 
-export function generateTypeBySymbol(symbol: ts.Symbol, config: CodeEmitConfig): string {
-  const type = config.typeChecker.getTypeOfSymbol(symbol);
+export function generateContextualTypeByExpression(node: ts.Expression, config: CodeEmitConfig): string {
+  let { typeChecker } = config;
+  const type: ts.Type = typeChecker.getTypeAtLocation(node);
   return generateTypeByType(type, config);
 }
 
-export function generateRawTypeByTypeNode(node: ts.Node, config: CodeEmitConfig): string {
-  let { typeChecker } = config;
-  const symbol: ts.Symbol | undefined = typeChecker.getSymbolAtLocation(node);
-  if (symbol == undefined) throw new CannotResolveSymbol();
-  return `ts_${symbol.name}`;
+export function generateTypeBySymbol(symbol: ts.Symbol, config: CodeEmitConfig): string {
+  const type = config.typeChecker.getTypeOfSymbol(symbol);
+  return generateTypeByType(type, config);
 }
 
 function getNamespaceType(type: ts.Type, config: CodeEmitConfig): string {

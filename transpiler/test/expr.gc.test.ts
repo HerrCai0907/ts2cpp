@@ -13,7 +13,7 @@ describe("new expression", () => {
       auto ts_f() -> builtin::ts_type_t<ts_A> {
         builtin::StackManager ts_builtin_stack_manager{};
         {
-          return builtin::store_return(ts_builtin_stack_manager, new ts_A());
+          return builtin::store_return(ts_builtin_stack_manager, builtin::gc_create_object<builtin::ts_type_t<ts_A>>());
         }
       }
       "
@@ -30,7 +30,7 @@ describe("new expression", () => {
       auto ts_f() -> builtin::ts_type_t<ts_A> {
         builtin::StackManager ts_builtin_stack_manager{};
         {
-          return builtin::store_return(ts_builtin_stack_manager, new ts_A(1,2,3));
+          return builtin::store_return(ts_builtin_stack_manager, builtin::gc_create_object<builtin::ts_type_t<ts_A>>(1,2,3));
         }
       }
       "

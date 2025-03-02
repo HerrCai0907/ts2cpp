@@ -6,7 +6,7 @@ import { generateTypeBySymbol, generateTypeByType } from "./type_generator.js";
 import { generateIdentifier } from "./identifier_generator.js";
 import { zip } from "../adt/array.js";
 import { indent, indentConfig } from "./indent.js";
-import { emitFunctionEntry } from "./builtin/gc.js";
+import { emitFunctionEntry, gcCreateObjectFn } from "./builtin/gc.js";
 import { generateExpression } from "./expression_generator.js";
 
 export function emitFunctionDeclaration(funcNode: ts.FunctionDeclaration, config: CodeEmitConfig) {
@@ -126,7 +126,7 @@ export function emitFunctionExpression(node: ts.ArrowFunction, config: CodeEmitC
   const { returnType, parameters } = processFunctionDeclaration(node, config);
   // FIXME: closure gc
   // FIXME: different behavior with ts for captured number
-  w(`builtin::create_object<${type}>(`);
+  w(`${gcCreateObjectFn}<${type}>(`);
   indent(w)(`[] (${parameters}) -> ${returnType} {`);
   if (ts.isExpression(node.body)) {
     indent(indent(w))(`return ${generateExpression(node.body, config)};`);

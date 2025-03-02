@@ -8,6 +8,7 @@ export function emitFunctionEntry(config: CodeEmitConfig) {
 
 export const gcStoreReturnFn = `builtin::store_return`;
 export const gcVisitFn = `builtin::gc_visit`;
+export const gcCreateObjectFn = `builtin::gc_create_object`;
 
 export const gcObjClass = `builtin::GcObject`;
 
