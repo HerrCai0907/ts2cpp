@@ -4,7 +4,7 @@
 
 namespace ts::builtin {
 
-template <IsTsType Ret, IsTsType... Args> struct Function : public GcObject {
+template <class Ret, class... Args> struct Function : public GcObject {
   using FnType = Ret (*)(Args...);
   FnType m_fn;
 

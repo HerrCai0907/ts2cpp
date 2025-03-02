@@ -10,9 +10,7 @@ namespace ts::builtin {
 
 using size_t = uint32_t;
 
-template <class T> struct ts_type;
-
-template <IsGcObject T> struct ts_type<T> {
+template <class T> struct ts_type {
   using type = GcRef<T>;
 };
 template <> struct ts_type<ts_number> {

@@ -1,6 +1,7 @@
-import { A, foo } from "./lib.js";
+import { foo } from "./lib1.js";
+import { A } from "./lib2.js";
 
-let inc = (n: A) => {
+let inc = (n: number) => {
   return (v: number) => {
     return v;
   };
@@ -8,4 +9,4 @@ let inc = (n: A) => {
 
 foo();
 
-console.log(inc(new A())(2)); // 3
+console.log(inc(new A().v)(2)); // 3

@@ -32,18 +32,36 @@ loader.forEachSource((sourceFile: ts.SourceFile): void => {
   extractor.records.forEach((record) => {
     CodeEmitter.emitClassPreDeclaration(record, config);
   });
+  w(`} // namespace ${ns}`);
+});
 
+loader.forEachSource((sourceFile: ts.SourceFile): void => {
+  let extractor = new DeclarationExtractor();
+  extractor.run(sourceFile);
+
+  const ns = CodeEmitter.convertToNamespace(sourceFile);
+  w(`namespace ${ns} {`);
+  const config = new CodeEmitConfig(w, sourceFile, loader.typeChecker);
   extractor.globals.forEach((global) => {
     CodeEmitter.emitGlobalDefinition(global, config);
   });
   extractor.funcs.forEach((func) => {
     CodeEmitter.emitFunctionDeclaration(func, config);
   });
+  w(`} // namespace ${ns}`);
+});
+
+loader.forEachSource((sourceFile: ts.SourceFile): void => {
+  let extractor = new DeclarationExtractor();
+  extractor.run(sourceFile);
+
+  const ns = CodeEmitter.convertToNamespace(sourceFile);
+  w(`namespace ${ns} {`);
+  const config = new CodeEmitConfig(w, sourceFile, loader.typeChecker);
   extractor.records.forEach((record) => {
     CodeEmitter.emitClassDeclaration(record, config);
   });
   CodeEmitter.emitGlobalInit(extractor.init, config);
-
   extractor.funcs.forEach((func) => {
     CodeEmitter.emitFunctionDefinition(func, config);
   });

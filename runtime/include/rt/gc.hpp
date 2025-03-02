@@ -1,6 +1,5 @@
 #pragma once
 
-#include "rt/basic_type.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -25,11 +24,11 @@ struct GcObject {
 template <class T>
 concept IsGcObject = std::is_base_of_v<GcObject, T>;
 
-template <IsGcObject T> struct GcRef {
+template <class T> struct GcRef {
   using pointee_type = T;
   pointee_type *m_pointer;
 
-  pointee_type operator->() const noexcept { return m_pointer; }
+  pointee_type *operator->() const noexcept { return m_pointer; }
 };
 
 template <class T>
@@ -41,10 +40,7 @@ template <class T> struct is_gc_ref : public std::false_type {};
 template <IsGcRef T> struct is_gc_ref<T> : public std::true_type {};
 template <class T> static constexpr bool is_gc_ref_v = is_gc_ref<T>::value;
 
-template <class T>
-concept IsTsType = IsGcRef<T> || std::is_same_v<T, ts_number>;
-
-template <IsTsType T> void gc_visit(T obj) {
+template <class T> void gc_visit(T obj) {
   if constexpr (is_gc_ref_v<T>) {
     obj->ts_builtin_gc_visit();
   } else {
@@ -80,7 +76,7 @@ private:
   void set_return_value_impl(GcObject *obj) noexcept;
 };
 
-template <IsTsType T> T store_return(StackManager &manager, T return_value) {
+template <class T> T store_return(StackManager &manager, T return_value) {
   if constexpr (is_gc_ref_v<T>) {
     return manager.set_return_value(return_value);
   } else {
@@ -89,7 +85,7 @@ template <IsTsType T> T store_return(StackManager &manager, T return_value) {
   return return_value;
 }
 
-template <IsTsType T, class... Args> T gc_create_object(Args &&...args) {
+template <class T, class... Args> T gc_create_object(Args &&...args) {
   using E = typename T::pointee_type;
   return T{new E(std::forward<Args>(args)...)};
 }
