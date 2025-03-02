@@ -1,15 +1,15 @@
 import { ts } from "@ts-morph/bootstrap";
 import { DeclarationExtractor } from "./declaration_extractor.js";
 import { CodeEmitConfig } from "./emitter/config.js";
-import { Source, SourceLoader } from "./source_loader.js";
+import { SourceLoader } from "./source_loader.js";
 import * as CodeEmitter from "./emitter/index.js";
-import { readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { indent } from "./emitter/indent.js";
 import { generatedSymbolPrefix } from "./emitter/builtin/runtime.js";
 
-const sourcePath = "example/demo.ts";
 const loader = new SourceLoader();
-loader.loadSource(new Source(sourcePath, readFileSync(sourcePath, "utf-8")));
+loader.loadConfig("example/tsconfig.json");
+
 let output: string[] = [
   `#include "rt/console.hpp"`,
   `#include "rt/function.hpp"`,
@@ -17,6 +17,9 @@ let output: string[] = [
   `#include "rt/operator.hpp"`,
   `#include "rt/type.hpp"`,
 ];
+
+loader.forEachSource((s) => console.log(s.fileName));
+
 const w = (m: string) => output.push(m);
 
 loader.forEachSource((sourceFile: ts.SourceFile): void => {

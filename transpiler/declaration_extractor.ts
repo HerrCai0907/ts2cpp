@@ -22,7 +22,7 @@ export class DeclarationExtractor {
     if (env["DEBUG"]) console.log(chalk.gray(this._ident + ts.SyntaxKind[node.kind]));
     this._ident += "  ";
   }
-  private _endVisit(node: ts.Node) {
+  private _endVisit(_: ts.Node) {
     this._ident = this._ident.slice(0, -2);
   }
 
@@ -44,6 +44,8 @@ export class DeclarationExtractor {
         this.init.push(node as ts.VariableStatement);
         break;
       case SyntaxKind.EndOfFileToken:
+        break;
+      case SyntaxKind.ImportDeclaration:
         break;
       default:
         if (!ts.isStatement(node)) throw new NotImplementError(`Unsupported node kind: ${ts.SyntaxKind[node.kind]}`);

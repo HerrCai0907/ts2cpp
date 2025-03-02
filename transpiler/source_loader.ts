@@ -1,6 +1,5 @@
 import { ts } from "@ts-morph/bootstrap";
 import * as morph from "@ts-morph/bootstrap";
-import { AssertFalse } from "./error.js";
 
 export class Source {
   constructor(
@@ -10,24 +9,24 @@ export class Source {
 }
 
 export class SourceLoader {
-  private _sourcePath = new Set<string>();
   private _project = morph.createProjectSync({ skipLoadingLibFiles: true });
   program = this._project.createProgram();
 
+  loadConfig(configPath: string) {
+    this._project.addSourceFilesFromTsConfigSync(configPath);
+    this.program = this._project.createProgram();
+  }
+
   loadSource(source: Source): void {
-    this._sourcePath.add(source.path);
     this._project.createSourceFile(source.path, source.text);
     this.program = this._project.createProgram();
   }
 
   forEachSource<T>(fn: (node: ts.SourceFile) => T): T[] {
-    let ret = [];
-    for (let path of this._sourcePath) {
-      let source = this.program.getSourceFile(path);
-      if (source == undefined) throw new AssertFalse(`invalid source ${path}`);
-      ret.push(fn(source));
-    }
-    return ret;
+    const sources = this.program
+      .getSourceFiles()
+      .filter((s) => !this.program.isSourceFileFromExternalLibrary(s) && !this.program.isSourceFileDefaultLibrary(s));
+    return sources.map(fn);
   }
 
   getDiags(): string[] {
