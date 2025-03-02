@@ -29,6 +29,10 @@ export class SourceLoader {
     return sources.map(fn);
   }
 
+  getSource(fileName: string): ts.SourceFile | undefined {
+    return this.program.getSourceFile(fileName);
+  }
+
   getDiags(): string[] {
     return this.program.getSyntacticDiagnostics().map((d) => d.messageText.toString());
   }

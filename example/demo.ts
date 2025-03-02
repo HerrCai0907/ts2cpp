@@ -1,6 +1,6 @@
 import { A } from "./lib.js";
 
-let inc = (n: number) => {
+let inc = (n: A) => {
   return (v: number) => {
     return v;
   };

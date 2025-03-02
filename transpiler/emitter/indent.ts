@@ -5,5 +5,5 @@ export function indent(write: (m: string) => void) {
 }
 
 export function indentConfig(config: CodeEmitConfig, level = 1): CodeEmitConfig {
-  return new CodeEmitConfig(config.println, config.typeChecker, config.indentLevel + level);
+  return new CodeEmitConfig(config.println, config.sourceFile, config.typeChecker, config.indentLevel + level);
 }

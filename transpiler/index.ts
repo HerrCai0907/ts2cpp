@@ -28,7 +28,7 @@ loader.forEachSource((sourceFile: ts.SourceFile): void => {
 
   const ns = CodeEmitter.convertToNamespace(sourceFile);
   w(`namespace ${ns} {`);
-  const config = new CodeEmitConfig(w, loader.typeChecker);
+  const config = new CodeEmitConfig(w, sourceFile, loader.typeChecker);
   extractor.records.forEach((record) => {
     CodeEmitter.emitClassPreDeclaration(record, config);
   });

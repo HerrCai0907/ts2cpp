@@ -3,6 +3,7 @@ import { CodeEmitConfig } from "./config.js";
 import assert from "assert";
 import { CannotResolveSymbol, NotImplementError } from "../error.js";
 import { funcTypeTemplate, typeTemplate } from "./builtin/type.js";
+import { convertToNamespace } from "./source_emitter.js";
 
 export function generateTypeByNode(node: ts.Node, config: CodeEmitConfig): string {
   let { typeChecker } = config;
@@ -23,6 +24,19 @@ export function generateRawTypeByTypeNode(node: ts.Node, config: CodeEmitConfig)
   return `ts_${symbol.name}`;
 }
 
+function getNamespaceType(type: ts.Type, config: CodeEmitConfig): string {
+  const symbol = type.getSymbol();
+  if (symbol == undefined) return ""; // Built-in type
+  const declarations = symbol.getDeclarations();
+  if (!declarations) return "";
+  for (let declaration of declarations) {
+    if (declaration.getSourceFile() != config.sourceFile) {
+      return convertToNamespace(declaration.getSourceFile()) + "::";
+    }
+  }
+  return "";
+}
+
 export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): string {
   assert(!type.isLiteral());
   const signatures = config.typeChecker.getSignaturesOfType(type, ts.SignatureKind.Call);
@@ -34,13 +48,14 @@ export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): strin
     const parameters = parameterTypes.map((t) => `,${t}`).join("");
     return `${funcTypeTemplate}<${returnType}${parameters}>`;
   }
-  const typeString = config.typeChecker.typeToString(type);
+
+  const typeString = "ts_" + config.typeChecker.typeToString(type);
+  const typeNamespace = getNamespaceType(type, config);
   switch (typeString) {
-    case "void":
-      return `ts_void`;
-    case "number":
-      return `ts_number`;
+    case "ts_void":
+    case "ts_number":
+      return typeString;
     default:
-      return `${typeTemplate}<ts_${typeString}>`;
+      return `${typeTemplate}<${typeNamespace}${typeString}>`;
   }
 }
