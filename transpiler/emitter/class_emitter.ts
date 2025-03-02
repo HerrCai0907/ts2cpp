@@ -93,7 +93,7 @@ function emitConstructor(node: ts.ClassDeclaration, config: CodeEmitConfig) {
 function emitField(node: ts.PropertyDeclaration, config: CodeEmitConfig) {
   let w = (str: string) => config.write(str);
   if (ts.isIdentifier(node.name)) {
-    const type = generateTypeByNode(node.name, config);
+    const type = generateTypeByNode(node.name, node.type, config);
     const variable = generateIdentifier(node.name, config);
     w(`${type} ${variable}{};`);
     w(`${type} const& ${generateGetterIdentifier(node.name, config)}() const noexcept { return this->${variable}; }`);

@@ -14,5 +14,5 @@
     "strictPropertyInitialization": true,
     "strictBuiltinIteratorReturn": true
   },
-  "files": ["lib1.ts", "./demo.ts"]
+  "include": ["*.ts"]
 }

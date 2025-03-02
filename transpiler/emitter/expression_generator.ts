@@ -6,7 +6,7 @@ import assert from "assert";
 import { isAccessMethod, isAccessProperty } from "./symbol_helper.js";
 import { emitFunctionExpression } from "./function_emitter.js";
 import { gcCreateObjectFn } from "./builtin/gc.js";
-import { generateContextualTypeByExpression, generateTypeByNode, generateTypeByType } from "./type_generator.js";
+import { generateContextualTypeByExpression } from "./type_generator.js";
 
 export function generateExpression(node: ts.Expression, config: CodeEmitConfig): string {
   switch (node.kind) {
@@ -22,10 +22,12 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
       return generateNewExpression(node as ts.NewExpression, config);
     case ts.SyntaxKind.PropertyAccessExpression:
       return generatePropertyAccessExpression(node as ts.PropertyAccessExpression, config);
-    case ts.SyntaxKind.ThisKeyword:
-      return `this`;
     case ts.SyntaxKind.ArrowFunction:
       return generateArrowFunction(node as ts.ArrowFunction, config);
+    case ts.SyntaxKind.ThisKeyword:
+      return `this`;
+    case ts.SyntaxKind.NullKeyword:
+      return `nullptr`;
     default:
       throw new NotImplementError(`unhandled expression kind ${ts.SyntaxKind[node.kind]}`);
   }

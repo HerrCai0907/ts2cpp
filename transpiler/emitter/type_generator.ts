@@ -2,11 +2,12 @@ import { ts } from "@ts-morph/bootstrap";
 import { CodeEmitConfig } from "./config.js";
 import assert from "assert";
 import { CannotResolveSymbol, NotImplementError } from "../error.js";
-import { funcTypeTemplate, typeTemplate } from "./builtin/type.js";
-import { convertToNamespace, getNamespaceForType } from "./source_emitter.js";
+import { funcTypeTemplate, typeTemplate, unionTypeTemplate } from "./builtin/type.js";
+import { getNamespaceForType } from "./source_emitter.js";
 
-export function generateTypeByNode(node: ts.Node, config: CodeEmitConfig): string {
+export function generateTypeByNode(node: ts.Node, typeNode: ts.TypeNode | undefined, config: CodeEmitConfig): string {
   let { typeChecker } = config;
+  if (typeNode != undefined) return generateTypeByType(config.typeChecker.getTypeFromTypeNode(typeNode), config);
   const symbol: ts.Symbol | undefined = typeChecker.getSymbolAtLocation(node);
   if (symbol == undefined) throw new CannotResolveSymbol();
   return generateTypeBySymbol(symbol, config);
@@ -34,7 +35,14 @@ export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): strin
     const parameters = parameterTypes.map((t) => `,${t}`).join("");
     return `${funcTypeTemplate}<${returnType}${parameters}>`;
   }
-
+  if (type.flags & ts.TypeFlags.Boolean) {
+    // FIXME
+    return `${typeTemplate}<ts_boolean>`;
+  }
+  if (type.isUnion()) {
+    const subTypes = type.types.map((t) => generateTypeByType(t, config)).join(",");
+    return `${unionTypeTemplate}<${subTypes}>`;
+  }
   const typeString = "ts_" + config.typeChecker.typeToString(type);
   const typeNamespace = getNamespaceForType(type, config);
   switch (typeString) {
