@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { transpilerGlobalDefinition } from "./helper";
+import { transpilerGlobalDefinition, transpilerGlobalInit } from "./helper";
 import { Source } from "../source_loader";
 
 test("import class", () => {
@@ -12,6 +12,23 @@ test("import class", () => {
     `
     "
     static builtin::ts_type_t<ts::lib::ts_A> ts_a{};
+    "
+  `,
+  );
+});
+
+test("import function", () => {
+  const code = `
+    import { foo } from "./lib.js";
+    foo();
+  `;
+  const lib = new Source("lib.ts", "export function foo() {}");
+  expect(transpilerGlobalInit(code, [lib])).toMatchInlineSnapshot(
+    `
+    "
+    void _ts_init() {
+      ts::lib::ts_foo();
+    }
     "
   `,
   );

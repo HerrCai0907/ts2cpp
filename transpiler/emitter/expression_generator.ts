@@ -13,7 +13,7 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
     case ts.SyntaxKind.NumericLiteral:
       return node.getText();
     case ts.SyntaxKind.Identifier:
-      return `ts_${node.getText()}`;
+      return generateIdentifier(node as ts.Identifier, config);
     case ts.SyntaxKind.BinaryExpression:
       return generateBinaryExpression(node as ts.BinaryExpression, config);
     case ts.SyntaxKind.CallExpression:
