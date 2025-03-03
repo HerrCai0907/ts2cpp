@@ -1,7 +1,12 @@
 import { ts } from "@ts-morph/bootstrap";
 import { NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
-import { generateGetterIdentifier, generateIdentifier, generateSetterIdentifier } from "./identifier_generator.js";
+import {
+  generateGetterIdentifier,
+  generateIdentifier,
+  generateIdentifierInExpr,
+  generateSetterIdentifier,
+} from "./identifier_generator.js";
 import assert from "assert";
 import { isAccessMethod, isAccessProperty } from "./symbol_helper.js";
 import { emitFunctionExpression } from "./function_emitter.js";
@@ -13,7 +18,7 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
     case ts.SyntaxKind.NumericLiteral:
       return node.getText();
     case ts.SyntaxKind.Identifier:
-      return generateIdentifier(node as ts.Identifier, config);
+      return generateIdentifierInExpr(node as ts.Identifier, config);
     case ts.SyntaxKind.BinaryExpression:
       return generateBinaryExpression(node as ts.BinaryExpression, config);
     case ts.SyntaxKind.CallExpression:
@@ -27,7 +32,7 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
     case ts.SyntaxKind.ThisKeyword:
       return `this`;
     case ts.SyntaxKind.NullKeyword:
-      return `nullptr`;
+      return `ts_null{}`;
     default:
       throw new NotImplementError(`unhandled expression kind ${ts.SyntaxKind[node.kind]}`);
   }

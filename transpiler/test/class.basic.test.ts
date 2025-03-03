@@ -3,10 +3,10 @@ import { transpilerClassDeclaration, transpilerClassDefinition, transpilerClassP
 
 test("class pre definition", () => {
   expect(transpilerClassPreDeclaration("class A {}")).toMatchInlineSnapshot(`
-      "
-      struct ts_A;
-      "
-    `);
+    "
+    struct ts_A;
+    "
+  `);
 });
 
 test("class declaration", () => {
@@ -65,13 +65,13 @@ test("class with init expr", () => {
 
 test("class definition", () => {
   expect(transpilerClassDefinition(`class A { a: number, b: string, }`)).toMatchInlineSnapshot(`
-      "
-      void ts_A::ts_builtin_gc_visit_all_children() const {
-        builtin::gc_visit(this->ts_a);
-        builtin::gc_visit(this->ts_b);
-      }
-      "
-    `);
+    "
+    void ts_A::ts_builtin_gc_visit_all_children() const {
+      builtin::gc_visit(this->ts_a);
+      builtin::gc_visit(this->ts_b);
+    }
+    "
+  `);
   expect(transpilerClassDefinition(`class A { foo () {} }`)).toMatchInlineSnapshot(`
     "
     auto ts_A::ts_foo() -> ts_void {

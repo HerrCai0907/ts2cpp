@@ -10,13 +10,7 @@ import { generatedSymbolPrefix } from "./emitter/builtin/runtime.js";
 const loader = new SourceLoader();
 loader.loadConfig("example/tsconfig.json");
 
-let output: string[] = [
-  `#include "rt/console.hpp"`,
-  `#include "rt/function.hpp"`,
-  `#include "rt/gc.hpp"`,
-  `#include "rt/operator.hpp"`,
-  `#include "rt/type.hpp"`,
-];
+let output: string[] = [`#include "rt/console.hpp"`, `#include "rt/builtin.hpp"`];
 
 loader.forEachSource((s) => console.log(s.fileName));
 

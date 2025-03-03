@@ -13,7 +13,7 @@ test("nullable class", () => {
   expect(transpilerGlobalInit(code)).toMatchInlineSnapshot(`
     "
     void _ts_init() {
-      ts_v = nullptr;
+      ts_v = ts_null{};
     }
     "
   `);
