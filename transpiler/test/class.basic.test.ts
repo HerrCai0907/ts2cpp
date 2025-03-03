@@ -55,7 +55,7 @@ test("class with init expr", () => {
   `);
   expect(transpilerClassDefinition(code)).toMatchInlineSnapshot(`
     "
-    ts_A::ts_A() : ts_a{10} {}
+    ts_A::ts_A() : ts_a{ts_number{10}} {}
     void ts_A::ts_builtin_gc_visit_all_children() const {
       builtin::gc_visit(this->ts_a);
     }
@@ -95,7 +95,7 @@ test("class definition", () => {
     auto ts_A::ts_foo() -> ts_number {
       builtin::StackManager ts_builtin_stack_manager{};
       {
-        return builtin::store_return(ts_builtin_stack_manager, 1);
+        return builtin::store_return(ts_builtin_stack_manager, ts_number{1});
       }
     }
     auto ts_A::ts_bar(ts_number ts_a, ts_number ts_b) -> ts_number {

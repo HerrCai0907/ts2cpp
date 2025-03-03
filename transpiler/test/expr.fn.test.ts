@@ -25,7 +25,7 @@ test("empty", () => {
     void _ts_init() {
       ts_fn = builtin::gc_create_object<builtin::ts_func_t<ts_number>>(
         [] () -> ts_number {
-          return 1;
+          return ts_number{1};
         }
       );
     }

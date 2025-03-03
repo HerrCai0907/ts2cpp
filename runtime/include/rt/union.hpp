@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <limits>
 #include <type_traits>
 #include <utility>
 
@@ -17,7 +18,8 @@ template <std::size_t I, class T, class F, class... Args> struct FindImpl {
       std::is_same_v<T, F> ? I : FindImpl<I + 1, T, Args...>::value;
 };
 template <std::size_t I, class T, class F> struct FindImpl<I, T, F> {
-  static constexpr std::size_t value = std::is_same_v<T, F> ? I : -1U;
+  static constexpr std::size_t value =
+      std::is_same_v<T, F> ? I : std::numeric_limits<std::size_t>::max();
 };
 template <class T, class... Args> struct Find {
   static constexpr std::size_t value = FindImpl<0, T, Args...>::value;
@@ -30,7 +32,7 @@ template <class... Args> struct union_type_t {
   union_type_t() {}
   template <class T> union_type_t(T &&t) {
     constexpr std::size_t index = union_type::detail::Find<T, Args...>::value;
-    static_assert(index != -1, "");
+    static_assert(index != std::numeric_limits<std::size_t>::max(), "");
     m_kind = index;
     new (&m_storage) T(std::forward<T>(t));
   }

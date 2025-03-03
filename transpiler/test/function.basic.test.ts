@@ -35,7 +35,7 @@ describe("basic function", () => {
       auto ts_start() -> ts_number {
         builtin::StackManager ts_builtin_stack_manager{};
         {
-          return builtin::store_return(ts_builtin_stack_manager, 0);
+          return builtin::store_return(ts_builtin_stack_manager, ts_number{0});
         }
       }
       "
@@ -47,7 +47,7 @@ describe("basic function", () => {
       auto ts_start() -> ts_number {
         builtin::StackManager ts_builtin_stack_manager{};
         {
-          return builtin::store_return(ts_builtin_stack_manager, 0);
+          return builtin::store_return(ts_builtin_stack_manager, ts_number{0});
         }
       }
       "

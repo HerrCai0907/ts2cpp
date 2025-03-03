@@ -16,7 +16,7 @@ import { generateContextualTypeByExpression } from "./type_generator.js";
 export function generateExpression(node: ts.Expression, config: CodeEmitConfig): string {
   switch (node.kind) {
     case ts.SyntaxKind.NumericLiteral:
-      return node.getText();
+      return `ts_number{${node.getText()}}`;
     case ts.SyntaxKind.Identifier:
       return generateIdentifierInExpr(node as ts.Identifier, config);
     case ts.SyntaxKind.BinaryExpression:

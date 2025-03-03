@@ -70,7 +70,7 @@ test("with default initializer", () => {
 
   expect(transpilerClassDefinition(code)).toMatchInlineSnapshot(`
     "
-    ts_A::ts_A(ts_number ts_v) : ts_n{100} {
+    ts_A::ts_A(ts_number ts_v) : ts_n{ts_number{100}} {
       builtin::StackManager ts_builtin_stack_manager{};
       {
       }
