@@ -7,7 +7,7 @@ test("nullable class", () => {
   let v: A | null = null;`;
   expect(transpilerGlobalDefinition(code)).toMatchInlineSnapshot(`
     "
-    static builtin::ts_type_t<ts_A> ts_v{};
+    static builtin::union_type_t<builtin::ts_type_t<ts_null>,builtin::ts_type_t<ts_A>> ts_v{};
     "
   `);
   expect(transpilerGlobalInit(code)).toMatchInlineSnapshot(`

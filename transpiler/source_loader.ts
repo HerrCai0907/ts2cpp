@@ -2,14 +2,14 @@ import { ts } from "@ts-morph/bootstrap";
 import * as morph from "@ts-morph/bootstrap";
 
 export class Source {
-  constructor(
-    public readonly path: string,
-    public readonly text: string,
-  ) {}
+  constructor(public readonly path: string, public readonly text: string) {}
 }
 
 export class SourceLoader {
-  private _project = morph.createProjectSync({ skipLoadingLibFiles: true });
+  private _project = morph.createProjectSync({
+    compilerOptions: { strictNullChecks: true },
+    skipLoadingLibFiles: true,
+  });
   program = this._project.createProgram();
 
   loadConfig(configPath: string) {

@@ -6,11 +6,15 @@ import { funcTypeTemplate, typeTemplate, unionTypeTemplate } from "./builtin/typ
 import { getNamespaceForType } from "./source_emitter.js";
 
 export function generateTypeByNode(node: ts.Node, typeNode: ts.TypeNode | undefined, config: CodeEmitConfig): string {
-  let { typeChecker } = config;
-  if (typeNode != undefined) return generateTypeByType(config.typeChecker.getTypeFromTypeNode(typeNode), config);
-  const symbol: ts.Symbol | undefined = typeChecker.getSymbolAtLocation(node);
+  if (typeNode != undefined) return generateTypeByTypeNode(typeNode, config);
+  const symbol: ts.Symbol | undefined = config.typeChecker.getSymbolAtLocation(node);
   if (symbol == undefined) throw new CannotResolveSymbol();
   return generateTypeBySymbol(symbol, config);
+}
+
+function generateTypeByTypeNode(typeNode: ts.TypeNode, config: CodeEmitConfig): string {
+  let type = config.typeChecker.getTypeFromTypeNode(typeNode);
+  return generateTypeByType(type, config);
 }
 
 export function generateContextualTypeByExpression(node: ts.Expression, config: CodeEmitConfig): string {

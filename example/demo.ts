@@ -1,3 +1,2 @@
-class A {
-  v: A | A | A | number | null = 1;
-}
+class A {}
+let v: A | null = null;
