@@ -13,7 +13,7 @@ test("declare statement", () => {
     auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
       builtin::StackManager ts_builtin_stack_manager{};
       {
-        ts_number ts_a{1};
+        ts_number ts_a{ts_number{1}};
       }
     }
     "
@@ -52,7 +52,7 @@ test("expression statement", () => {
     auto ts_add(ts_number ts_a, ts_number ts_b) -> ts_number {
       builtin::StackManager ts_builtin_stack_manager{};
       {
-        builtin::binary_operator_plus(1, 2);
+        builtin::binary_operator_plus(ts_number{1}, ts_number{2});
       }
     }
     "

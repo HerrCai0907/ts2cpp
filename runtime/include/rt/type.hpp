@@ -3,8 +3,11 @@
 #include "rt/gc.hpp"
 #include <cstdint>
 
+namespace ts {
 using ts_void = void;
 using ts_number = double;
+struct ts_null {};
+} // namespace ts
 
 namespace ts::builtin {
 

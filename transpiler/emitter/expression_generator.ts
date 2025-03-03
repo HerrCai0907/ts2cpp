@@ -1,19 +1,24 @@
 import { ts } from "@ts-morph/bootstrap";
 import { NotImplementError } from "../error.js";
 import { CodeEmitConfig } from "./config.js";
-import { generateGetterIdentifier, generateIdentifier, generateSetterIdentifier } from "./identifier_generator.js";
+import {
+  generateGetterIdentifier,
+  generateIdentifier,
+  generateIdentifierInExpr,
+  generateSetterIdentifier,
+} from "./identifier_generator.js";
 import assert from "assert";
 import { isAccessMethod, isAccessProperty } from "./symbol_helper.js";
 import { emitFunctionExpression } from "./function_emitter.js";
 import { gcCreateObjectFn } from "./builtin/gc.js";
-import { generateContextualTypeByExpression, generateTypeByNode, generateTypeByType } from "./type_generator.js";
+import { generateContextualTypeByExpression } from "./type_generator.js";
 
 export function generateExpression(node: ts.Expression, config: CodeEmitConfig): string {
   switch (node.kind) {
     case ts.SyntaxKind.NumericLiteral:
-      return node.getText();
+      return `ts_number{${node.getText()}}`;
     case ts.SyntaxKind.Identifier:
-      return generateIdentifier(node as ts.Identifier, config);
+      return generateIdentifierInExpr(node as ts.Identifier, config);
     case ts.SyntaxKind.BinaryExpression:
       return generateBinaryExpression(node as ts.BinaryExpression, config);
     case ts.SyntaxKind.CallExpression:
@@ -22,10 +27,12 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
       return generateNewExpression(node as ts.NewExpression, config);
     case ts.SyntaxKind.PropertyAccessExpression:
       return generatePropertyAccessExpression(node as ts.PropertyAccessExpression, config);
-    case ts.SyntaxKind.ThisKeyword:
-      return `this`;
     case ts.SyntaxKind.ArrowFunction:
       return generateArrowFunction(node as ts.ArrowFunction, config);
+    case ts.SyntaxKind.ThisKeyword:
+      return `this`;
+    case ts.SyntaxKind.NullKeyword:
+      return `ts_null{}`;
     default:
       throw new NotImplementError(`unhandled expression kind ${ts.SyntaxKind[node.kind]}`);
   }

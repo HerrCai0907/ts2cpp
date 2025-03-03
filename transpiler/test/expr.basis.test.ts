@@ -145,7 +145,7 @@ describe("property access expression", () => {
       auto ts_f(builtin::ts_type_t<ts_A> ts_a) -> ts_void {
         builtin::StackManager ts_builtin_stack_manager{};
         {
-          ts_a->_ts_set_v(1);
+          ts_a->_ts_set_v(ts_number{1});
         }
       }
       "

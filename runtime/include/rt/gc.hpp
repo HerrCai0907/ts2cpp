@@ -49,6 +49,7 @@ template <class T> void gc_visit(T obj) {
 }
 
 struct Root {
+  // FIXME: global variable
   GcObject *m_shadowstack[SHADOW_STACK_SIZE];
   size_t m_index = 0U;
   uint32_t m_color = 0U;

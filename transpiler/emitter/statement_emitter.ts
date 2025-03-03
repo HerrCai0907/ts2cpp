@@ -28,7 +28,7 @@ function emitVariableStatement(node: ts.VariableStatement, config: CodeEmitConfi
   let declarations = node.declarationList.declarations;
   if (declarations.length != 1) throw new NotImplementError(`multiple declarations in variable statement`);
   let declaration = declarations[0];
-  const type = generateTypeByNode(declaration.name, config);
+  const type = generateTypeByNode(declaration.name, declaration.type, config);
   const initExpr = declaration.initializer ? generateExpression(declaration.initializer, config) : "";
   if (!ts.isIdentifier(declaration.name)) throw new NotImplementError(ts.SyntaxKind[declaration.name.kind]);
   w(`${type} ${generateIdentifier(declaration.name, config)}{${initExpr}};`);

@@ -1,12 +1,8 @@
-import { foo } from "./lib1.js";
-import { A } from "./lib2.js";
+class A {
+  a = 100;
+}
+let v: A | null | number = new A();
 
-let inc = (n: number) => {
-  return (v: number) => {
-    return v;
-  };
-};
-
-foo();
-
-console.log(inc(new A().v)(2)); // 3
+console.log(v.a);
+v = 10;
+console.log(v);

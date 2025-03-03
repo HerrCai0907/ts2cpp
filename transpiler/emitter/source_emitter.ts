@@ -33,7 +33,6 @@ export function getNamespaceForType(type: ts.Type, config: CodeEmitConfig): stri
 }
 
 export function getNamespaceForIdentifier(node: ts.Identifier, config: CodeEmitConfig): string {
-  config.typeChecker.resolveName;
   const symbol = config.typeChecker.getSymbolAtLocation(node);
   if (symbol == undefined) throw new CannotResolveSymbol();
   const declarations = symbol.getDeclarations();
