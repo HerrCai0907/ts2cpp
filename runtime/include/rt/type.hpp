@@ -6,6 +6,7 @@
 namespace ts {
 using ts_void = void;
 using ts_number = double;
+using ts_boolean = bool;
 struct ts_null {};
 } // namespace ts
 

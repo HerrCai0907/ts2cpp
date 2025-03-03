@@ -31,6 +31,10 @@ export function generateExpression(node: ts.Expression, config: CodeEmitConfig):
       return generateArrowFunction(node as ts.ArrowFunction, config);
     case ts.SyntaxKind.ThisKeyword:
       return `this`;
+    case ts.SyntaxKind.TrueKeyword:
+      return `true`;
+    case ts.SyntaxKind.FalseKeyword:
+      return `false`;
     case ts.SyntaxKind.NullKeyword:
       return `ts_null{}`;
     default:

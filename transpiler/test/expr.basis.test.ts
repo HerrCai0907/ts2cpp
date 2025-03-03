@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { transpilerClassDefinition, transpilerFunctionDefinition } from "./helper";
+import { transpilerClassDefinition, transpilerFunctionDefinition, transpilerGlobalInit } from "./helper";
 
 describe("binary expression", () => {
   test("normal operator", () => {
@@ -47,7 +47,7 @@ describe("binary expression", () => {
       `),
     ).toMatchInlineSnapshot(`
       "
-      auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
+      auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_boolean {
         builtin::StackManager ts_builtin_stack_manager{};
         {
           return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_exclamation_equals_equals(ts_a, ts_b));
@@ -63,7 +63,7 @@ describe("binary expression", () => {
     `),
     ).toMatchInlineSnapshot(`
       "
-      auto ts_f(ts_number ts_a, ts_number ts_b) -> builtin::ts_type_t<ts_boolean> {
+      auto ts_f(ts_number ts_a, ts_number ts_b) -> ts_boolean {
         builtin::StackManager ts_builtin_stack_manager{};
         {
           return builtin::store_return(ts_builtin_stack_manager, builtin::binary_operator_equals_equals_equals(ts_a, ts_b));
@@ -190,4 +190,33 @@ test("this expr", () => {
     }
     "
   `);
+});
+
+describe("boolean literal", () => {
+  test("true expr", () => {
+    expect(
+      transpilerGlobalInit(`
+      true;
+  `),
+    ).toMatchInlineSnapshot(`
+      "
+      void _ts_init() {
+        true;
+      }
+      "
+    `);
+  });
+  test("false expr", () => {
+    expect(
+      transpilerGlobalInit(`
+      false;
+  `),
+    ).toMatchInlineSnapshot(`
+      "
+      void _ts_init() {
+        false;
+      }
+      "
+    `);
+  });
 });

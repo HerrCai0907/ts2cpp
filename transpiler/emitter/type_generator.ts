@@ -39,10 +39,7 @@ export function generateTypeByType(type: ts.Type, config: CodeEmitConfig): strin
     const parameters = parameterTypes.map((t) => `,${t}`).join("");
     return `${funcTypeTemplate}<${returnType}${parameters}>`;
   }
-  if (type.flags & ts.TypeFlags.Boolean) {
-    // FIXME
-    return `${typeTemplate}<ts_boolean>`;
-  }
+  if ((type.flags & ts.TypeFlags.Boolean) == ts.TypeFlags.Boolean) return `ts_boolean`;
   if (type.isUnion()) {
     const subTypes = type.types.map((t) => generateTypeByType(t, config)).join(",");
     return `${unionTypeTemplate}<${subTypes}>`;
